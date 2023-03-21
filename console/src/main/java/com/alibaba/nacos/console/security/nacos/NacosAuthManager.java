@@ -25,10 +25,12 @@ import com.alibaba.nacos.config.server.auth.RoleInfo;
 import com.alibaba.nacos.config.server.utils.RequestUtil;
 import com.alibaba.nacos.console.security.nacos.roles.NacosRoleServiceImpl;
 import com.alibaba.nacos.console.security.nacos.users.NacosUser;
+import com.alibaba.nacos.console.utils.ParamsEncryptUtil;
 import com.alibaba.nacos.core.utils.Loggers;
 import io.jsonwebtoken.ExpiredJwtException;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -47,7 +49,7 @@ import java.util.List;
  */
 @Component
 public class NacosAuthManager implements AuthManager {
-    
+
     private static final String TOKEN_PREFIX = "Bearer ";
     
     @Autowired
@@ -118,6 +120,7 @@ public class NacosAuthManager implements AuthManager {
         if (StringUtils.isBlank(bearerToken)) {
             String userName = request.getParameter("username");
             String password = request.getParameter("password");
+            password = ParamsEncryptUtil.getInstance().decryptAES(password);
             bearerToken = resolveTokenFromUser(userName, password);
         }
         

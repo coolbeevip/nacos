@@ -34,8 +34,11 @@ import com.alibaba.nacos.console.security.nacos.NacosAuthManager;
 import com.alibaba.nacos.console.security.nacos.roles.NacosRoleServiceImpl;
 import com.alibaba.nacos.console.security.nacos.users.NacosUser;
 import com.alibaba.nacos.console.security.nacos.users.NacosUserDetailsServiceImpl;
+import com.alibaba.nacos.console.utils.ParamsEncryptUtil;
 import com.alibaba.nacos.console.utils.PasswordEncoderUtil;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -65,7 +68,9 @@ import java.util.List;
 @RestController("user")
 @RequestMapping({"/v1/auth", "/v1/auth/users"})
 public class UserController {
-    
+
+    Logger log = LoggerFactory.getLogger(UserController.class);
+
     @Autowired
     private JwtTokenManager jwtTokenManager;
     
@@ -142,6 +147,9 @@ public class UserController {
     @Secured(resource = NacosAuthConfig.UPDATE_PASSWORD_ENTRY_POINT, action = ActionTypes.WRITE)
     public Object updateUser(@RequestParam String username, @RequestParam String newPassword,
             HttpServletResponse response, HttpServletRequest request) throws IOException {
+
+        newPassword = ParamsEncryptUtil.getInstance().decryptAES(newPassword);
+
         // admin or same user
         if (!hasPermission(username, request)) {
             return new RestResult<>(HttpServletResponse.SC_FORBIDDEN, "authorization failed!");
@@ -203,7 +211,14 @@ public class UserController {
     @PostMapping("/login")
     public Object login(@RequestParam String username, @RequestParam String password, HttpServletResponse response,
             HttpServletRequest request) throws AccessException {
-        
+
+        try {
+            password = ParamsEncryptUtil.getInstance().decryptAES(password);
+        } catch (Exception e) {
+            log.error("Login failed username {} password {}", username, password);
+            throw e;
+        }
+
         if (AuthSystemTypes.NACOS.name().equalsIgnoreCase(authConfigs.getNacosAuthSystemType())) {
             NacosUser user = (NacosUser) authManager.login(request);
             
