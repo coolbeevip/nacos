@@ -94,4 +94,40 @@
     
     <url>http://nacos.io</url>
 
+    <profiles>
+        <profile>
+            <!-- https://github.com/grpc/grpc-java/issues/7690 -->
+            <id>arm64</id>
+            <properties>
+                <os.detected.classifier>osx-x86_64</os.detected.classifier>
+            </properties>
+            <build>
+                <pluginManagement>
+                    <plugins>
+                        <plugin>
+                            <groupId>org.xolstice.maven.plugins</groupId>
+                            <artifactId>protobuf-maven-plugin</artifactId>
+                            <version>0.5.0</version>
+                            <configuration>
+                                <protocArtifact>com.google.protobuf:protoc:${protobuf-java.version}:exe:${os.detected.classifier}
+                                </protocArtifact>
+                                <pluginId>grpc-java</pluginId>
+                                <pluginArtifact>io.grpc:protoc-gen-grpc-java:${grpc-java.version}:exe:${os.detected.classifier}
+                                </pluginArtifact>
+                            </configuration>
+                            <executions>
+                                <execution>
+                                    <goals>
+                                        <goal>compile</goal>
+                                        <goal>compile-custom</goal>
+                                    </goals>
+                                </execution>
+                            </executions>
+                        </plugin>
+                    </plugins>
+                </pluginManagement>
+            </build>
+        </profile>
+    </profiles>
+
 </project>
