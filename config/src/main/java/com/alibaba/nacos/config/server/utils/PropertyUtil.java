@@ -100,7 +100,17 @@ public class PropertyUtil implements ApplicationContextInitializer<ConfigurableA
      * Inline storage value = ${nacos.standalone}.
      */
     private static boolean embeddedStorage = EnvUtil.getStandaloneMode();
-    
+
+    private static String useExternalDBDriverClassName;
+
+    public static String getUseExternalDBDriverClassName() {
+        return useExternalDBDriverClassName;
+    }
+
+    public static void setUseExternalDBDriverClassName(String useExternalDBDriverClassName) {
+        PropertyUtil.useExternalDBDriverClassName = useExternalDBDriverClassName;
+    }
+
     public static int getNotifyConnectTimeout() {
         return notifyConnectTimeout;
     }
@@ -274,7 +284,11 @@ public class PropertyUtil implements ApplicationContextInitializer<ConfigurableA
             setInitialExpansionPercent(getInt("initialExpansionPercent", initialExpansionPercent));
             
             // External data sources are used by default in cluster mode
-            setUseExternalDB("mysql".equalsIgnoreCase(getString("spring.datasource.platform", "")));
+            String platform = getString("spring.datasource.platform", "");
+            if (platform.trim().length() == 0) {
+                platform = getString("spring.sql.init.platform", "");
+            }
+            setUseExternalDB(!"".equalsIgnoreCase(platform));
             
             // must initialize after setUseExternalDB
             // This value is true in stand-alone mode and false in cluster mode

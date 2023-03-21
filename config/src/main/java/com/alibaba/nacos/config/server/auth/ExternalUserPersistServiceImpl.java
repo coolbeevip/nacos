@@ -19,6 +19,7 @@ package com.alibaba.nacos.config.server.auth;
 import com.alibaba.nacos.config.server.configuration.ConditionOnExternalStorage;
 import com.alibaba.nacos.config.server.model.Page;
 import com.alibaba.nacos.config.server.model.User;
+import com.alibaba.nacos.config.server.service.repository.ExternalDBType;
 import com.alibaba.nacos.config.server.service.repository.extrnal.ExternalStoragePersistServiceImpl;
 import com.alibaba.nacos.config.server.service.repository.PaginationHelper;
 import com.alibaba.nacos.config.server.utils.LogUtil;
@@ -64,7 +65,7 @@ public class ExternalUserPersistServiceImpl implements UserPersistService {
         String sql = "INSERT into users (username, password, enabled) VALUES (?, ?, ?)";
         
         try {
-            jt.update(sql, username, password, true);
+            jt.update(sql, username, password, ExternalDBType.dbType() == ExternalDBType.DBType.DERBY ? true : 1);
         } catch (CannotGetJdbcConnectionException e) {
             LogUtil.FATAL_LOG.error("[db-error] " + e.toString(), e);
             throw e;
@@ -149,8 +150,14 @@ public class ExternalUserPersistServiceImpl implements UserPersistService {
 
     @Override
     public List<String> findUserLikeUsername(String username) {
-        String sql = "SELECT username FROM users WHERE username like '%' ? '%'";
-        List<String> users = this.jt.queryForList(sql, new String[]{username}, String.class);
+        List<String> users;
+        if (ExternalDBType.dbType() == ExternalDBType.DBType.POSTGRESQL) {
+            String sql = "SELECT username FROM users WHERE username like ?";
+            users = this.jt.queryForList(sql, new String[]{"%" + username + "%"}, String.class);
+        } else {
+            String sql = "SELECT username FROM users WHERE username like '%' ? '%'";
+            users = this.jt.queryForList(sql, new String[]{username}, String.class);
+        }
         return users;
     }
 }
