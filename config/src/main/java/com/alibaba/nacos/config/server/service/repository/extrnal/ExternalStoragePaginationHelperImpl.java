@@ -17,6 +17,7 @@
 package com.alibaba.nacos.config.server.service.repository.extrnal;
 
 import com.alibaba.nacos.config.server.model.Page;
+import com.alibaba.nacos.config.server.service.repository.ExternalDBType;
 import com.alibaba.nacos.config.server.service.repository.PaginationHelper;
 import com.alibaba.nacos.config.server.service.sql.EmbeddedStorageContextUtils;
 import com.alibaba.nacos.config.server.utils.PropertyUtil;
@@ -86,7 +87,7 @@ class ExternalStoragePaginationHelperImpl<E> implements PaginationHelper {
         
         final int startRow = (pageNo - 1) * pageSize;
         String selectSql = "";
-        if (isDerby()) {
+        if (ExternalDBType.dbType() == ExternalDBType.DBType.DERBY || ExternalDBType.dbType() == ExternalDBType.DBType.POSTGRESQL) {
             selectSql = sqlFetchRows + " OFFSET " + startRow + " ROWS FETCH NEXT " + pageSize + " ROWS ONLY";
         } else if (lastMaxId != null) {
             selectSql = sqlFetchRows + " and id > " + lastMaxId + " order by id asc" + " limit " + 0 + "," + pageSize;
@@ -129,7 +130,7 @@ class ExternalStoragePaginationHelperImpl<E> implements PaginationHelper {
         }
         
         String selectSql = sqlFetchRows;
-        if (isDerby()) {
+        if (ExternalDBType.dbType() == ExternalDBType.DBType.DERBY || ExternalDBType.dbType() == ExternalDBType.DBType.POSTGRESQL) {
             selectSql = selectSql.replaceAll("(?i)LIMIT \\?,\\?", "OFFSET ? ROWS FETCH NEXT ? ROWS ONLY");
         }
         
@@ -168,7 +169,7 @@ class ExternalStoragePaginationHelperImpl<E> implements PaginationHelper {
         }
         
         String selectSql = sqlFetchRows;
-        if (isDerby()) {
+        if (ExternalDBType.dbType() == ExternalDBType.DBType.DERBY || ExternalDBType.dbType() == ExternalDBType.DBType.POSTGRESQL) {
             selectSql = selectSql.replaceAll("(?i)LIMIT \\?,\\?", "OFFSET ? ROWS FETCH NEXT ? ROWS ONLY");
         }
         
@@ -188,7 +189,7 @@ class ExternalStoragePaginationHelperImpl<E> implements PaginationHelper {
         final Page<E> page = new Page<E>();
         
         String selectSql = sqlFetchRows;
-        if (isDerby()) {
+        if (ExternalDBType.dbType() == ExternalDBType.DBType.DERBY || ExternalDBType.dbType() == ExternalDBType.DBType.POSTGRESQL) {
             selectSql = selectSql.replaceAll("(?i)LIMIT \\?,\\?", "OFFSET ? ROWS FETCH NEXT ? ROWS ONLY");
         }
         
@@ -202,7 +203,7 @@ class ExternalStoragePaginationHelperImpl<E> implements PaginationHelper {
     public void updateLimit(final String sql, final Object[] args) {
         String sqlUpdate = sql;
         
-        if (isDerby()) {
+        if (ExternalDBType.dbType() == ExternalDBType.DBType.DERBY || ExternalDBType.dbType() == ExternalDBType.DBType.POSTGRESQL) {
             sqlUpdate = sqlUpdate.replaceAll("limit \\?", "OFFSET 0 ROWS FETCH NEXT ? ROWS ONLY");
         }
         
@@ -212,10 +213,4 @@ class ExternalStoragePaginationHelperImpl<E> implements PaginationHelper {
             EmbeddedStorageContextUtils.cleanAllContext();
         }
     }
-    
-    private boolean isDerby() {
-        return (EnvUtil.getStandaloneMode() && !PropertyUtil.isUseExternalDB()) || PropertyUtil
-                .isEmbeddedStorage();
-    }
-    
 }

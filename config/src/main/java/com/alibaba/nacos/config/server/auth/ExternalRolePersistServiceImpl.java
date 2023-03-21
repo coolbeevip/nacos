@@ -18,6 +18,7 @@ package com.alibaba.nacos.config.server.auth;
 
 import com.alibaba.nacos.config.server.configuration.ConditionOnExternalStorage;
 import com.alibaba.nacos.config.server.model.Page;
+import com.alibaba.nacos.config.server.service.repository.ExternalDBType;
 import com.alibaba.nacos.config.server.service.repository.PaginationHelper;
 import com.alibaba.nacos.config.server.service.repository.extrnal.ExternalStoragePersistServiceImpl;
 import com.alibaba.nacos.config.server.utils.LogUtil;
@@ -157,8 +158,14 @@ public class ExternalRolePersistServiceImpl implements RolePersistService {
     
     @Override
     public List<String> findRolesLikeRoleName(String role) {
-        String sql = "SELECT role FROM roles WHERE role like '%' ? '%'";
-        List<String> users = this.jt.queryForList(sql, new String[] {role}, String.class);
+        List<String> users;
+        if (ExternalDBType.dbType() == ExternalDBType.DBType.POSTGRESQL) {
+            String sql = "SELECT role FROM roles WHERE role like ?";
+            users = this.jt.queryForList(sql, new String[]{"%" + role + "%"}, String.class);
+        } else {
+            String sql = "SELECT role FROM roles WHERE role like '%' ? '%'";
+            users = this.jt.queryForList(sql, new String[]{role}, String.class);
+        }
         return users;
     }
     
