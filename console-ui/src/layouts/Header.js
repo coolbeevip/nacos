@@ -93,7 +93,7 @@ class Header extends React.Component {
           <div className="header-body">
             <a href="#" onClick={this.indexAction} rel="noopener noreferrer">
               <img
-                src="img/logo-2000-390.svg"
+                src="img/logo-nc.png"
                 className="logo"
                 alt={siteConfig.name}
                 title={siteConfig.name}
@@ -108,9 +108,6 @@ class Header extends React.Component {
                 </Menu>
               </Dropdown>
             )}
-            <span className="language-switch language-switch-primary" onClick={this.switchLang}>
-              {languageSwitchButton}
-            </span>
             <div className="header-menu header-menu-open">
               <ul>
                 {NAV_MENU.map(item => (
