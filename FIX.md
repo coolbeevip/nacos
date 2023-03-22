@@ -18,3 +18,4 @@ npm run build
 ```
 
 cp ./dist/js/main.js ../console/src/main/resources/static/js/main.js 
+cp ./dist/css/main.css ../console/src/main/resources/static/css/main.css
