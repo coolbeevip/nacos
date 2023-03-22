@@ -36,7 +36,7 @@ const I18N_CONF = {
     invalidUsernameOrPassword: 'invalid username or password',
   },
   MainLayout: {
-    nacosName: 'NACOS',
+    nacosName: 'NC 注册中心',
     doesNotExist: 'The page you visit does not exist',
     configurationManagementVirtual: 'ConfigManagement',
     configurationManagement: 'Configurations',

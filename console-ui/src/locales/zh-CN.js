@@ -35,7 +35,7 @@ const I18N_CONF = {
     usernameRequired: '用户名不能为空',
   },
   MainLayout: {
-    nacosName: 'NACOS',
+    nacosName: 'NC 注册中心',
     doesNotExist: '您访问的页面不存在',
     configurationManagementVirtual: '配置管理',
     configurationManagement: '配置列表',
