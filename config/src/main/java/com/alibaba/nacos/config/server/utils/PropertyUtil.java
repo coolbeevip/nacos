@@ -292,7 +292,7 @@ public class PropertyUtil implements ApplicationContextInitializer<ConfigurableA
     
             // External data sources are used by default in cluster mode
             String platform = DatasourcePlatformUtil.getDatasourcePlatform("");
-            setUseExternalDB(!"".equalsIgnoreCase(platform));
+            setUseExternalDB(!"".equalsIgnoreCase(platform) && !"derby".equals(platform));
             
             // must initialize after setUseExternalDB
             // This value is true in stand-alone mode and false in cluster mode
