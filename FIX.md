@@ -41,3 +41,27 @@ console/src/main/java/com/alibaba/nacos/console/config/ConsoleConfig.java
         source.registerCorsConfiguration("/**", config);
         return new CorsFilter(source);
     }
+
+## console-ui debug
+
+修改 console-ui/build/webpack.dev.conf.js 文件，修改如下两行
+
+```js  
+  devServer: {
+    port: process.env.PORT || 8000,
+        proxy: [{
+        context: ['/'],
+        // changeOrigin: true, 此处屏蔽
+        // secure: false, 此处屏蔽
+        target: 'http://localhost:8848', // 此处指定为实际服务地址
+        ws: false, // 增加此行
+        pathRewrite: {'^/v1' : '/nacos/v1', '^/v2' : '/nacos/v2'}
+    }],
+        disableHostCheck: true,
+        open: true,
+        hot: true,
+        overlay: true
+},
+```
+
+启动 npm start
