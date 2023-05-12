@@ -18,7 +18,7 @@ import React from 'react';
 import { withRouter } from 'react-router-dom';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
-import { ConfigProvider, Icon, Menu } from '@alifd/next';
+import { ConfigProvider, Icon, Menu, Message } from '@alifd/next';
 import Header from './Header';
 import { getState } from '../reducers/base';
 import getMenuData from './menu';
@@ -42,7 +42,23 @@ class MainLayout extends React.Component {
   };
 
   componentDidMount() {
-    this.props.getState();
+    this.props.getState().then(() => {
+      if (this.props.lcValid === false) {
+        const list = this.props.lcContent;
+        let viewList = [];
+        for (let i = 0, len = list.length; i < len; i++) {
+          viewList.push(<li key={`content${i}`}>{list[i]}</li>);
+        }
+
+        Message.show({
+          title: <font color="#a52a2a">License 无效，请联系管理员！</font>,
+          type: 'notice',
+          content: <ul>{viewList}</ul>,
+          closeable: true,
+          duration: 0,
+        });
+      }
+    });
   }
 
   goBack() {

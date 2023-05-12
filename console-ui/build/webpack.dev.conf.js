@@ -37,9 +37,10 @@ module.exports = Object.assign({}, base, {
     port: process.env.PORT || 8000,
     proxy: [{
       context: ['/'],
-      changeOrigin: true,
-      secure: false,
-      target: 'http://localhost:8848',
+      // changeOrigin: true,
+      // secure: false,
+      target: 'http://10.19.88.60:8848', // debug
+      ws: false, // debug
       pathRewrite: {'^/v1' : '/nacos/v1', '^/v2' : '/nacos/v2'}
     }],
     disableHostCheck: true,
