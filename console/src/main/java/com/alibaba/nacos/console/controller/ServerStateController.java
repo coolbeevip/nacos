@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -41,14 +42,23 @@ public class ServerStateController {
      * @return state json.
      */
     @GetMapping("/state")
-    public ResponseEntity<Map<String, String>> serverState() {
-        Map<String, String> serverState = new HashMap<>(4);
+    public ResponseEntity<Map<String, Object>> serverState() {
+        Map<String, Object> serverState = new HashMap<>(4);
         serverState.put("standalone_mode",
                 EnvUtil.getStandaloneMode() ? EnvUtil.STANDALONE_MODE_ALONE : EnvUtil.STANDALONE_MODE_CLUSTER);
         
         serverState.put("function_mode", EnvUtil.getFunctionMode());
         serverState.put("version", VersionUtils.version);
-        
+
+        Boolean licenseValid = Boolean.valueOf(System.getProperty("nc.license.valid", "true"));
+        String[] contents;
+        serverState.put("lcValid", licenseValid);
+        try {
+            contents = new String(Base64.getDecoder().decode(System.getProperty("nc.license.content"))).split("\n");
+        } catch (Exception e) {
+            contents = new String[]{System.getProperty("nc.license.content")};
+        }
+        serverState.put("lcContent", contents);
         return ResponseEntity.ok().body(serverState);
     }
     

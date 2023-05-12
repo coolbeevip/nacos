@@ -47,6 +47,8 @@ const getState = () => dispatch =>
           version: res.version,
           standaloneMode: res.standalone_mode,
           functionMode: res.function_mode,
+          lcValid: res.lcValid,
+          lcContent: res.lcContent,
         },
       });
     })
