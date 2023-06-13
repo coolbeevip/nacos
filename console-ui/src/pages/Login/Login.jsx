@@ -125,7 +125,7 @@ class Login extends React.Component {
                 <Form.Submit onClick={this.handleSubmit}>{locale.submit}</Form.Submit>
               </FormItem>
               <div className="internal-sys-tip">
-                <div>Powered By NACOS 2.2.1</div>
+                <div>Powered By NACOS 2.2.3</div>
               </div>
             </Form>
           </Card>
