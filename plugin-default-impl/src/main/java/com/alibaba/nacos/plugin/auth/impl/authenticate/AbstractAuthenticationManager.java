@@ -27,6 +27,7 @@ import com.alibaba.nacos.plugin.auth.impl.token.TokenManagerDelegate;
 import com.alibaba.nacos.plugin.auth.impl.users.NacosUser;
 import com.alibaba.nacos.plugin.auth.impl.users.NacosUserDetails;
 import com.alibaba.nacos.plugin.auth.impl.users.NacosUserDetailsServiceImpl;
+import com.alibaba.nacos.plugin.auth.impl.utils.ParamsEncryptUtil;
 import com.alibaba.nacos.plugin.auth.impl.utils.PasswordEncoderUtil;
 
 import javax.servlet.http.HttpServletRequest;
@@ -70,6 +71,7 @@ public class AbstractAuthenticationManager implements IAuthenticationManager {
         if (StringUtils.isBlank(token)) {
             throw new AccessException("user not found!");
         }
+        
         return jwtTokenManager.parseToken(token);
     }
     
@@ -83,6 +85,7 @@ public class AbstractAuthenticationManager implements IAuthenticationManager {
         } else {
             String userName = httpServletRequest.getParameter(AuthConstants.PARAM_USERNAME);
             String password = httpServletRequest.getParameter(AuthConstants.PARAM_PASSWORD);
+            password = ParamsEncryptUtil.getInstance().decryptAES(password);
             user = authenticate(userName, password);
         }
         

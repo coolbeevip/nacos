@@ -19,6 +19,7 @@ package com.alibaba.nacos.test.core.auth;
 import com.alibaba.nacos.api.PropertyKeyConst;
 import com.alibaba.nacos.auth.config.AuthConfigs;
 import com.alibaba.nacos.common.utils.JacksonUtils;
+import com.alibaba.nacos.plugin.auth.impl.utils.ParamsEncryptUtil;
 import com.alibaba.nacos.test.base.HttpClient4Test;
 import com.alibaba.nacos.test.base.Params;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -61,10 +62,16 @@ public class AuthBase extends HttpClient4Test {
     protected Properties properties;
     
     protected String namespace1 = "namespace1";
-    
+
+    private String nacosPassword = "nacos";
+
+    public String getNacosPassword() {
+        return nacosPassword;
+    }
+
     public String login(String username, String password) {
-        ResponseEntity<String> response = request("/nacos/v1/auth/users/login",
-                Params.newParams().appendParam("username", username).appendParam("password", password).done(),
+        ResponseEntity<String> response = requestWithoutEscape("/nacos/v1/auth/users/login",
+                Params.newParams().appendParam("username", username).appendParam("password", ParamsEncryptUtil.getInstance().encrypAES(password)).done(),
                 String.class, HttpMethod.POST);
         
         Assert.assertTrue(response.getStatusCode().is2xxSuccessful());
@@ -74,7 +81,7 @@ public class AuthBase extends HttpClient4Test {
     }
     
     public String login() {
-        return login("nacos", "nacos");
+        return login("nacos", this.getNacosPassword());
     }
     
     protected void init(int port) throws Exception {
@@ -86,23 +93,23 @@ public class AuthBase extends HttpClient4Test {
         accessToken = login();
         
         // Create a user:
-        ResponseEntity<String> response = request("/nacos/v1/auth/users",
-                Params.newParams().appendParam("username", username1).appendParam("password", password1)
+        ResponseEntity<String> response = requestWithoutEscape("/nacos/v1/auth/users",
+                Params.newParams().appendParam("username", username1).appendParam("password", ParamsEncryptUtil.getInstance().encrypAES(password1))
                         .appendParam("accessToken", accessToken).done(), String.class, HttpMethod.POST);
         System.out.println(response);
         Assert.assertTrue(response.getStatusCode().is2xxSuccessful());
         
         // Create a user:
-        response = request("/nacos/v1/auth/users",
-                Params.newParams().appendParam("username", username2).appendParam("password", password2)
+        response = requestWithoutEscape("/nacos/v1/auth/users",
+                Params.newParams().appendParam("username", username2).appendParam("password", ParamsEncryptUtil.getInstance().encrypAES(password2))
                         .appendParam("accessToken", accessToken).done(), String.class, HttpMethod.POST);
         
         System.out.println(response);
         Assert.assertTrue(response.getStatusCode().is2xxSuccessful());
         
         // Create a user:
-        response = request("/nacos/v1/auth/users",
-                Params.newParams().appendParam("username", username3).appendParam("password", password3)
+        response = requestWithoutEscape("/nacos/v1/auth/users",
+                Params.newParams().appendParam("username", username3).appendParam("password", ParamsEncryptUtil.getInstance().encrypAES(password3))
                         .appendParam("accessToken", accessToken).done(), String.class, HttpMethod.POST);
         
         System.out.println(response);
