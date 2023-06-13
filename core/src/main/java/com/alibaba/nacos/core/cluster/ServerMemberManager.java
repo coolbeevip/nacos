@@ -354,7 +354,8 @@ public class ServerMemberManager implements ApplicationListener<WebServerInitial
         boolean isContainSelfIp = members.stream()
                 .anyMatch(ipPortTmp -> Objects.equals(localAddress, ipPortTmp.getAddress()));
         
-        if (isContainSelfIp) {
+        // if (isContainSelfIp) {
+        if (true) {
             isInIpList = true;
         } else {
             isInIpList = false;
