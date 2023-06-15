@@ -151,7 +151,7 @@ public class NacosAuthManager {
     
     private void validate0(String token) throws AccessException {
         if (StringUtils.isBlank(token)) {
-            throw new AccessException("user not found!");
+            throw new AccessException("未授权访问!");
         }
         
         tokenManager.validateToken(token);

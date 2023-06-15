@@ -92,7 +92,7 @@ public final class NacosSignatureAlgorithm {
      */
     public static NacosUser verify(String jwt, Key key) throws AccessException {
         if (StringUtils.isBlank(jwt)) {
-            throw new AccessException("user not found!");
+            throw new AccessException("未授权访问!");
         }
         String[] split = jwt.split("\\.");
         if (split.length != JWT_PARTS) {
@@ -145,7 +145,7 @@ public final class NacosSignatureAlgorithm {
      */
     public static long getExpiredTimeInSeconds(String jwt, Key key) throws AccessException {
         if (StringUtils.isBlank(jwt)) {
-            throw new AccessException("user not found!");
+            throw new AccessException("未授权访问!");
         }
         String[] split = jwt.split("\\.");
         if (split.length != JWT_PARTS) {
