@@ -56,12 +56,12 @@ public class AbstractAuthenticationManager implements IAuthenticationManager {
     @Override
     public NacosUser authenticate(String username, String rawPassword) throws AccessException {
         if (StringUtils.isBlank(username) || StringUtils.isBlank(rawPassword)) {
-            throw new AccessException("user not found!");
+            throw new AccessException("未授权访问!");
         }
         
         NacosUserDetails nacosUserDetails = (NacosUserDetails) userDetailsService.loadUserByUsername(username);
         if (nacosUserDetails == null || !PasswordEncoderUtil.matches(rawPassword, nacosUserDetails.getPassword())) {
-            throw new AccessException("user not found!");
+            throw new AccessException("未授权访问!");
         }
         return new NacosUser(nacosUserDetails.getUsername(), jwtTokenManager.createToken(username));
     }
@@ -69,7 +69,7 @@ public class AbstractAuthenticationManager implements IAuthenticationManager {
     @Override
     public NacosUser authenticate(String token) throws AccessException {
         if (StringUtils.isBlank(token)) {
-            throw new AccessException("user not found!");
+            throw new AccessException("未授权访问!");
         }
         
         return jwtTokenManager.parseToken(token);
