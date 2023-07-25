@@ -32,7 +32,7 @@ public class ConfigInfoTagsRelationMapperByOracle extends AbstractMapper impleme
 
     @Override
     public String findConfigInfo4PageFetchRows(final Map<String, String> params, int tagSize, int startRow,
-            int pageSize) {
+                                               int pageSize) {
         final String appName = params.get("appName");
         final String dataId = params.get("dataId");
         final String group = params.get("group");
@@ -41,9 +41,9 @@ public class ConfigInfoTagsRelationMapperByOracle extends AbstractMapper impleme
         final String sql =
                 "SELECT a.id,a.data_id,a.group_id,a.tenant_id,a.app_name,a.content FROM config_info  a LEFT JOIN "
                         + "config_tags_relation b ON a.id=b.id";
-        
-        where.append(" a.tenant_id=? ");
-        
+
+        where.append(" nvl(a.tenant_id,'public') = nvl(?,'public') ");
+
         if (StringUtils.isNotBlank(dataId)) {
             where.append(" AND a.data_id=? ");
         }
@@ -66,10 +66,10 @@ public class ConfigInfoTagsRelationMapperByOracle extends AbstractMapper impleme
         where.append(") ");
         return sql + where + " OFFSET " + startRow + " ROWS FETCH NEXT " + pageSize + " ROWS ONLY";
     }
-    
+
     @Override
     public String findConfigInfoLike4PageFetchRows(final Map<String, String> params, int tagSize, int startRow,
-            int pageSize) {
+                                                   int pageSize) {
         final String appName = params.get("appName");
         final String content = params.get("content");
         final String dataId = params.get("dataId");
@@ -78,8 +78,8 @@ public class ConfigInfoTagsRelationMapperByOracle extends AbstractMapper impleme
         final String sqlFetchRows =
                 "SELECT a.ID,a.data_id,a.group_id,a.tenant_id,a.app_name,a.content FROM config_info  a LEFT JOIN "
                         + "config_tags_relation b ON a.id=b.id ";
-        
-        where.append(" a.tenant_id LIKE ? ");
+
+        where.append(" nvl(a.tenant_id,'public') = nvl(?,'public') ");
         if (!StringUtils.isBlank(dataId)) {
             where.append(" AND a.data_id LIKE ? ");
         }
@@ -92,7 +92,7 @@ public class ConfigInfoTagsRelationMapperByOracle extends AbstractMapper impleme
         if (!StringUtils.isBlank(content)) {
             where.append(" AND a.content LIKE ? ");
         }
-        
+
         where.append(" AND b.tag_name IN (");
         for (int i = 0; i < tagSize; i++) {
             if (i != 0) {
