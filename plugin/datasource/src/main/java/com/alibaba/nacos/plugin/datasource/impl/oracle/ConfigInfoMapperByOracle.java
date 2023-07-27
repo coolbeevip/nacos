@@ -16,6 +16,7 @@
 
 package com.alibaba.nacos.plugin.datasource.impl.oracle;
 
+import com.alibaba.nacos.common.utils.CollectionUtils;
 import com.alibaba.nacos.common.utils.NamespaceUtil;
 import com.alibaba.nacos.common.utils.StringUtils;
 import com.alibaba.nacos.plugin.datasource.constants.DataSourceConstant;
@@ -230,6 +231,30 @@ public class ConfigInfoMapperByOracle extends AbstractMapper implements ConfigIn
     }
 
     @Override
+    public String findConfigInfo4PageCountRows(Map<String, String> params) {
+        final String appName = params.get(APP_NAME);
+        final String dataId = params.get(DATA_ID);
+        final String group = params.get(GROUP);
+        final String content = params.get(CONTENT);
+        final String sqlCount = "SELECT count(*) FROM config_info";
+        StringBuilder where = new StringBuilder(" WHERE ");
+        where.append(" nvl(tenant_id,'public') = nvl(?,'public') ");
+        if (StringUtils.isNotBlank(dataId)) {
+            where.append(" AND data_id=? ");
+        }
+        if (StringUtils.isNotBlank(group)) {
+            where.append(" AND group_id=? ");
+        }
+        if (StringUtils.isNotBlank(appName)) {
+            where.append(" AND app_name=? ");
+        }
+        if (!StringUtils.isBlank(content)) {
+            where.append(" AND content LIKE ? ");
+        }
+        return sqlCount + where;
+    }
+
+    @Override
     public String findConfigInfo4PageFetchRows(Map<String, String> params, int startRow, int pageSize) {
         final String appName = params.get(APP_NAME);
         final String dataId = params.get(DATA_ID);
@@ -251,6 +276,39 @@ public class ConfigInfoMapperByOracle extends AbstractMapper implements ConfigIn
             where.append(" AND content LIKE ? ");
         }
         return sql + where + " OFFSET " + startRow + " ROWS FETCH NEXT " + pageSize + " ROWS ONLY";
+    }
+
+    @Override
+    public String findChangeConfigCountRows(Map<String, String> params, final Timestamp startTime,
+                                            final Timestamp endTime) {
+        final String tenant = params.get(TENANT);
+        final String dataId = params.get(DATA_ID);
+        final String group = params.get(GROUP);
+        final String appName = params.get(APP_NAME);
+        final String sqlCountRows = "SELECT count(*) FROM config_info WHERE ";
+        String where = " 1=1 ";
+
+        if (!StringUtils.isBlank(dataId)) {
+            where += " AND data_id LIKE ? ";
+        }
+        if (!StringUtils.isBlank(group)) {
+            where += " AND group_id LIKE ? ";
+        }
+
+        if (!StringUtils.isBlank(tenant)) {
+            where += " AND nvl(tenant_id,'public') = nvl(?,'public') ";
+        }
+
+        if (!StringUtils.isBlank(appName)) {
+            where += " AND app_name = ? ";
+        }
+        if (startTime != null) {
+            where += " AND gmt_modified >=? ";
+        }
+        if (endTime != null) {
+            where += " AND gmt_modified <=? ";
+        }
+        return sqlCountRows + where;
     }
 
     @Override
@@ -312,6 +370,47 @@ public class ConfigInfoMapperByOracle extends AbstractMapper implements ConfigIn
         return " SELECT t.id,data_id,group_id,tenant_id,app_name,content,md5 "
                 + " FROM ( SELECT id FROM config_info  WHERE nvl(tenant_id,'public') = nvl(?,'public') ORDER BY id OFFSET ? ROWS FETCH NEXT ? ROWS ONLY )"
                 + " g, config_info t  WHERE g.id = t.id ";
+    }
+
+    /**
+     * query all configuration information according to group, appName, tenant (for export).
+     * The default sql:
+     * SELECT id,data_id,group_id,tenant_id,app_name,content,type,md5,gmt_create,gmt_modified,
+     * src_user,src_ip,c_desc,c_use,effect,c_schema,encrypted_data_key
+     * FROM config_info WHERE ...
+     *
+     * @param ids       ids
+     * @param params    The map of params, the key is the parameter name(dataId, group, appName),
+     *                  the value is the key's value.
+     * @return Collection of ConfigInfo objects
+     */
+    @Override
+    public String findAllConfigInfo4Export(List<Long> ids, Map<String, String> params) {
+        String sql = "SELECT id,data_id,group_id,tenant_id,app_name,content,type,md5,gmt_create,gmt_modified,"
+                + "src_user,src_ip,c_desc,c_use,effect,c_schema,encrypted_data_key FROM config_info";
+        StringBuilder where = new StringBuilder(" WHERE ");
+        if (!CollectionUtils.isEmpty(ids)) {
+            where.append(" id IN (");
+            for (int i = 0; i < ids.size(); i++) {
+                if (i != 0) {
+                    where.append(", ");
+                }
+                where.append('?');
+            }
+            where.append(") ");
+        } else {
+            where.append(" nvl(tenant_id,'public') = nvl(?, 'public') ");
+            if (StringUtils.isNotBlank(params.get(DATA_ID))) {
+                where.append(" AND data_id LIKE ? ");
+            }
+            if (StringUtils.isNotBlank(params.get(GROUP))) {
+                where.append(" AND nvl(group_id,'public') = nvl(?, 'public') ");
+            }
+            if (StringUtils.isNotBlank(params.get(APP_NAME))) {
+                where.append(" AND nvl(app_name,'public') = nvl(?, 'public') ");
+            }
+        }
+        return sql + where;
     }
 
     @Override
