@@ -140,7 +140,9 @@ public class ExternalConfigInfoPersistServiceImpl implements ConfigInfoPersistSe
         if (s.contains(PATTERN_STR)) {
             return s.replaceAll(fuzzySearchSign, sqlLikePercentSign);
         } else {
-            if ("oracle".equalsIgnoreCase(dataSourceService.getDataSourceType())) {
+            if (s != null && s.trim().length() > 0) {
+                return s;
+            } else if ("oracle".equalsIgnoreCase(dataSourceService.getDataSourceType())) {
                 return null;
             } else {
                 return s;
