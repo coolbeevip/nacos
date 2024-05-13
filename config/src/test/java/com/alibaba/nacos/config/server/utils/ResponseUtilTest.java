@@ -23,9 +23,8 @@ import org.springframework.mock.web.MockHttpServletResponse;
 import java.io.UnsupportedEncodingException;
 
 public class ResponseUtilTest {
-    
-    String lineSeparator = java.security.AccessController.doPrivileged(
-            new sun.security.action.GetPropertyAction("line.separator"));
+
+    String lineSeparator = System.lineSeparator();
     
     @Test
     public void testWriteErrMsg() {

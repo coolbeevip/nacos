@@ -16,6 +16,7 @@
 
 package com.alibaba.nacos.core.controller;
 
+import com.alibaba.nacos.auth.annotation.Secured;
 import com.alibaba.nacos.common.model.RestResult;
 import com.alibaba.nacos.common.model.RestResultUtils;
 import com.alibaba.nacos.common.utils.JacksonUtils;
@@ -26,6 +27,8 @@ import com.alibaba.nacos.core.cluster.NodeState;
 import com.alibaba.nacos.core.cluster.ServerMemberManager;
 import com.alibaba.nacos.core.utils.Commons;
 import com.alibaba.nacos.core.utils.Loggers;
+import com.alibaba.nacos.plugin.auth.constant.ActionTypes;
+import com.alibaba.nacos.plugin.auth.constant.SignType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -63,6 +66,7 @@ public class NacosClusterController {
      * @return all members
      */
     @GetMapping(value = "/nodes")
+    @Secured(action = ActionTypes.READ, resource = "nacos/admin", signType = SignType.CONSOLE)
     public RestResult<Collection<Member>> listNodes(
             @RequestParam(value = "keyword", required = false) String ipKeyWord) {
         Collection<Member> members = memberManager.allMembers();
@@ -86,6 +90,7 @@ public class NacosClusterController {
     // cluster according to this interface
     
     @GetMapping(value = "/simple/nodes")
+    @Secured(action = ActionTypes.READ, resource = "nacos/admin", signType = SignType.CONSOLE)
     public RestResult<Collection<String>> listSimpleNodes() {
         return RestResultUtils.success(memberManager.getMemberAddressInfos());
     }
@@ -103,6 +108,7 @@ public class NacosClusterController {
      */
     @Deprecated
     @PostMapping(value = {"/report"})
+    @Secured(action = ActionTypes.READ, resource = "nacos/admin", signType = SignType.CONSOLE)
     public RestResult<String> report(@RequestBody Member node) {
         if (!node.check()) {
             return RestResultUtils.failedWithMsg(400, "Node information is illegal");
@@ -121,6 +127,7 @@ public class NacosClusterController {
      * @return {@link RestResult}
      */
     @PostMapping(value = "/switch/lookup")
+    @Secured(action = ActionTypes.READ, resource = "nacos/admin", signType = SignType.CONSOLE)
     public RestResult<String> switchLookup(@RequestParam(name = "type") String type) {
         try {
             memberManager.switchLookup(type);
@@ -138,6 +145,7 @@ public class NacosClusterController {
      * @throws Exception {@link Exception}
      */
     @PostMapping("/server/leave")
+    @Secured(action = ActionTypes.READ, resource = "nacos/admin", signType = SignType.CONSOLE)
     public RestResult<String> leave(@RequestBody Collection<String> params,
             @RequestParam(defaultValue = "true") Boolean notifyOtherMembers) throws Exception {
         return RestResultUtils.failed(405, "/v1/core/cluster/server/leave API not allow to use temporarily.");
