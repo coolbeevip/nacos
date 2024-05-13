@@ -55,6 +55,7 @@ public class NacosClusterController {
     }
     
     @GetMapping(value = "/self")
+    @Secured(action = ActionTypes.READ, resource = "nacos/admin", signType = SignType.CONSOLE)
     public RestResult<Member> self() {
         return RestResultUtils.success(memberManager.getSelf());
     }
