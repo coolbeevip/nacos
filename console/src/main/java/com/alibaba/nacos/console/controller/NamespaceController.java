@@ -26,6 +26,7 @@ import com.alibaba.nacos.console.model.Namespace;
 import com.alibaba.nacos.console.model.NamespaceAllInfo;
 import com.alibaba.nacos.console.service.NamespaceOperationService;
 import com.alibaba.nacos.plugin.auth.constant.ActionTypes;
+import com.alibaba.nacos.plugin.auth.constant.SignType;
 import com.alibaba.nacos.plugin.auth.impl.constant.AuthConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -65,6 +66,7 @@ public class NamespaceController {
      * @return namespace list
      */
     @GetMapping
+    @Secured(action = ActionTypes.READ, resource = "nacos/admin", signType = SignType.CONSOLE)
     public RestResult<List<Namespace>> getNamespaces() {
         return RestResultUtils.success(namespaceOperationService.getNamespaceList());
     }
@@ -76,6 +78,7 @@ public class NamespaceController {
      * @return namespace all info
      */
     @GetMapping(params = "show=all")
+    @Secured(action = ActionTypes.READ, resource = "nacos/admin", signType = SignType.CONSOLE)
     public NamespaceAllInfo getNamespace(@RequestParam("namespaceId") String namespaceId) throws NacosException {
         return namespaceOperationService.getNamespace(namespaceId);
     }
@@ -117,6 +120,7 @@ public class NamespaceController {
      * @return true if exist, otherwise false
      */
     @GetMapping(params = "checkNamespaceIdExist=true")
+    @Secured(action = ActionTypes.READ, resource = "nacos/admin", signType = SignType.CONSOLE)
     public Boolean checkNamespaceIdExist(@RequestParam("customNamespaceId") String namespaceId) {
         if (StringUtils.isBlank(namespaceId)) {
             return false;
