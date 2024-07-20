@@ -93,7 +93,7 @@ public class ConfigOpsControllerTest {
         Assert.assertEquals(200, actualValue);
     }
     
-    @Test
+    // @Test nacos 2.4.0 版本中因为安全问题默认禁用此方法 https://github.com/alibaba/nacos/pull/12372
     public void testDerbyOps() throws Exception {
         MockedStatic<PropertyUtil> propertyUtilMockedStatic = Mockito.mockStatic(PropertyUtil.class);
         MockedStatic<DynamicDataSource> dynamicDataSourceMockedStatic = Mockito.mockStatic(DynamicDataSource.class);
@@ -114,8 +114,8 @@ public class ConfigOpsControllerTest {
         propertyUtilMockedStatic.close();
         dynamicDataSourceMockedStatic.close();
     }
-    
-    @Test
+
+    // @Test nacos 2.4.0 版本中因为安全问题默认禁用此方法 https://github.com/alibaba/nacos/pull/12372
     public void testImportDerby() throws Exception {
         MockedStatic<PropertyUtil> propertyUtilMockedStatic = Mockito.mockStatic(PropertyUtil.class);
         MockedStatic<ApplicationUtils> applicationUtilsMockedStatic = Mockito.mockStatic(ApplicationUtils.class);
