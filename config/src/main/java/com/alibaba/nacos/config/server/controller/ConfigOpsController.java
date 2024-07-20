@@ -93,27 +93,30 @@ public class ConfigOpsController {
     @GetMapping(value = "/derby")
     @Secured(action = ActionTypes.READ, resource = "nacos/admin")
     public RestResult<Object> derbyOps(@RequestParam(value = "sql") String sql) {
-        String selectSign = "SELECT";
-        String limitSign = "ROWS FETCH NEXT";
-        String limit = " OFFSET 0 ROWS FETCH NEXT 1000 ROWS ONLY";
-        try {
-            if (!PropertyUtil.isEmbeddedStorage()) {
-                return RestResultUtils.failed("The current storage mode is not Derby");
-            }
-            LocalDataSourceServiceImpl dataSourceService = (LocalDataSourceServiceImpl) DynamicDataSource
-                    .getInstance().getDataSource();
-            if (StringUtils.startsWithIgnoreCase(sql, selectSign)) {
-                if (!StringUtils.containsIgnoreCase(sql, limitSign)) {
-                    sql += limit;
-                }
-                JdbcTemplate template = dataSourceService.getJdbcTemplate();
-                List<Map<String, Object>> result = template.queryForList(sql);
-                return RestResultUtils.success(result);
-            }
-            return RestResultUtils.failed("Only query statements are allowed to be executed");
-        } catch (Exception e) {
-            return RestResultUtils.failed(e.getMessage());
-        }
+        // nacos 2.4.0 版本中因为安全问题默认禁用此方法 https://github.com/alibaba/nacos/pull/12372
+        return RestResultUtils.failed(
+                "Derby ops is disabled.");
+//        String selectSign = "SELECT";
+//        String limitSign = "ROWS FETCH NEXT";
+//        String limit = " OFFSET 0 ROWS FETCH NEXT 1000 ROWS ONLY";
+//        try {
+//            if (!PropertyUtil.isEmbeddedStorage()) {
+//                return RestResultUtils.failed("The current storage mode is not Derby");
+//            }
+//            LocalDataSourceServiceImpl dataSourceService = (LocalDataSourceServiceImpl) DynamicDataSource
+//                    .getInstance().getDataSource();
+//            if (StringUtils.startsWithIgnoreCase(sql, selectSign)) {
+//                if (!StringUtils.containsIgnoreCase(sql, limitSign)) {
+//                    sql += limit;
+//                }
+//                JdbcTemplate template = dataSourceService.getJdbcTemplate();
+//                List<Map<String, Object>> result = template.queryForList(sql);
+//                return RestResultUtils.success(result);
+//            }
+//            return RestResultUtils.failed("Only query statements are allowed to be executed");
+//        } catch (Exception e) {
+//            return RestResultUtils.failed(e.getMessage());
+//        }
     }
     
     /**
@@ -129,22 +132,25 @@ public class ConfigOpsController {
     @Secured(action = ActionTypes.WRITE, resource = "nacos/admin")
     public DeferredResult<RestResult<String>> importDerby(@RequestParam(value = "file") MultipartFile multipartFile) {
         DeferredResult<RestResult<String>> response = new DeferredResult<>();
-        if (!PropertyUtil.isEmbeddedStorage()) {
-            response.setResult(RestResultUtils.failed("Limited to embedded storage mode"));
-            return response;
-        }
-        DatabaseOperate databaseOperate = ApplicationUtils.getBean(DatabaseOperate.class);
-        WebUtils.onFileUpload(multipartFile, file -> {
-            NotifyCenter.publishEvent(new DerbyImportEvent(false));
-            databaseOperate.dataImport(file).whenComplete((result, ex) -> {
-                NotifyCenter.publishEvent(new DerbyImportEvent(true));
-                if (Objects.nonNull(ex)) {
-                    response.setResult(RestResultUtils.failed(ex.getMessage()));
-                    return;
-                }
-                response.setResult(result);
-            });
-        }, response);
+        // nacos 2.4.0 版本中因为安全问题默认禁用此方法 https://github.com/alibaba/nacos/pull/12372
+        response.setResult(RestResultUtils.failed(
+                "Derby ops is disabled."));
+//        if (!PropertyUtil.isEmbeddedStorage()) {
+//            response.setResult(RestResultUtils.failed("Limited to embedded storage mode"));
+//            return response;
+//        }
+//        DatabaseOperate databaseOperate = ApplicationUtils.getBean(DatabaseOperate.class);
+//        WebUtils.onFileUpload(multipartFile, file -> {
+//            NotifyCenter.publishEvent(new DerbyImportEvent(false));
+//            databaseOperate.dataImport(file).whenComplete((result, ex) -> {
+//                NotifyCenter.publishEvent(new DerbyImportEvent(true));
+//                if (Objects.nonNull(ex)) {
+//                    response.setResult(RestResultUtils.failed(ex.getMessage()));
+//                    return;
+//                }
+//                response.setResult(result);
+//            });
+//        }, response);
         return response;
     }
     
