@@ -49,10 +49,8 @@ class MainLayout extends React.Component {
     authEnabled: PropTypes.string,
     children: PropTypes.array,
     getNotice: PropTypes.func,
-    notice: PropTypes.string,
     consoleUiEnable: PropTypes.string,
     getGuide: PropTypes.func,
-    guideMsg: PropTypes.string,
   };
 
   componentDidMount() {
@@ -128,14 +126,6 @@ class MainLayout extends React.Component {
                   </div>
                 ) : (
                   <>
-                    <h1 className="nav-title">
-                      {locale.nacosName}
-                      <span>{version}</span>
-                    </h1>
-                    <h1 className="nav-mode">
-                      {locale.nacosMode}
-                      <span>{startupMode}</span>
-                    </h1>
                     <Menu
                       defaultOpenKeys={this.defaultOpenKeys()}
                       className="next-nav next-normal next-active next-right next-no-arrow next-nav-embeddable"
@@ -176,31 +166,7 @@ class MainLayout extends React.Component {
                 )}
               </div>
             </div>
-            <div className="right-panel next-shell-sub-main">
-              {authEnabled === 'false' && consoleUiEnable === 'true' ? (
-                <Message type="notice">
-                  <div dangerouslySetInnerHTML={{ __html: this.props.notice }} />
-                </Message>
-              ) : null}
-              {consoleUiEnable === 'false' && (
-                <Dialog
-                  visible={visible}
-                  title={locale.consoleClosed}
-                  style={{ width: 600 }}
-                  hasMask={false}
-                  footer={false}
-                  className="enable-dialog"
-                >
-                  <Message type="notice">
-                    <div
-                      style={{ lineHeight: '24px' }}
-                      dangerouslySetInnerHTML={{ __html: this.props.guideMsg }}
-                    />
-                  </Message>
-                </Dialog>
-              )}
-              {this.props.children}
-            </div>
+            <div className="right-panel next-shell-sub-main">{this.props.children}</div>
           </div>
         </section>
       </section>

@@ -27,6 +27,7 @@ import com.alibaba.nacos.plugin.auth.impl.token.TokenManagerDelegate;
 import com.alibaba.nacos.plugin.auth.impl.users.NacosUser;
 import com.alibaba.nacos.plugin.auth.impl.users.NacosUserDetails;
 import com.alibaba.nacos.plugin.auth.impl.users.NacosUserDetailsServiceImpl;
+import com.alibaba.nacos.plugin.auth.impl.utils.ParamsEncryptUtil;
 import com.alibaba.nacos.plugin.auth.impl.utils.PasswordEncoderUtil;
 
 import javax.servlet.http.HttpServletRequest;
@@ -55,11 +56,11 @@ public class AbstractAuthenticationManager implements IAuthenticationManager {
     @Override
     public NacosUser authenticate(String username, String rawPassword) throws AccessException {
         if (StringUtils.isBlank(username) || StringUtils.isBlank(rawPassword)) {
-            throw new AccessException("user not found!");
+            throw new AccessException("未授权访问!");
         }
         NacosUserDetails nacosUserDetails = (NacosUserDetails) userDetailsService.loadUserByUsername(username);
         if (nacosUserDetails == null || !PasswordEncoderUtil.matches(rawPassword, nacosUserDetails.getPassword())) {
-            throw new AccessException("user not found!");
+            throw new AccessException("未授权访问!");
         }
         return new NacosUser(nacosUserDetails.getUsername(), jwtTokenManager.createToken(username));
     }
@@ -67,7 +68,7 @@ public class AbstractAuthenticationManager implements IAuthenticationManager {
     @Override
     public NacosUser authenticate(String token) throws AccessException {
         if (StringUtils.isBlank(token)) {
-            throw new AccessException("user not found!");
+            throw new AccessException("未授权访问!");
         }
         return jwtTokenManager.parseToken(token);
     }
@@ -82,6 +83,7 @@ public class AbstractAuthenticationManager implements IAuthenticationManager {
         } else {
             String userName = httpServletRequest.getParameter(AuthConstants.PARAM_USERNAME);
             String password = httpServletRequest.getParameter(AuthConstants.PARAM_PASSWORD);
+            password = ParamsEncryptUtil.getInstance().decryptAES(password);
             user = authenticate(userName, password);
         }
         

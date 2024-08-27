@@ -38,6 +38,8 @@ public class DatasourceConfiguration implements ApplicationContextInitializer<Co
      * Inline storage value = ${nacos.standalone}.
      */
     public static boolean embeddedStorage = EnvUtil.getStandaloneMode();
+
+    private static String useExternalDBDriverClassName;
     
     public static boolean isUseExternalDB() {
         return useExternalDB;
@@ -54,7 +56,14 @@ public class DatasourceConfiguration implements ApplicationContextInitializer<Co
     public static void setEmbeddedStorage(boolean embeddedStorage) {
         DatasourceConfiguration.embeddedStorage = embeddedStorage;
     }
-    
+    public static String getUseExternalDBDriverClassName() {
+        return useExternalDBDriverClassName;
+    }
+
+    public static void setUseExternalDBDriverClassName(String useExternalDBDriverClassName) {
+        DatasourceConfiguration.useExternalDBDriverClassName = useExternalDBDriverClassName;
+    }
+
     private void loadDatasourceConfiguration() {
         // External data sources are used by default in cluster mode
         String platform = DatasourcePlatformUtil.getDatasourcePlatform("");

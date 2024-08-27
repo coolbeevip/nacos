@@ -1,2 +1,3 @@
 org.springframework.context.ApplicationContextInitializer=\
-  com.alibaba.nacos.persistence.configuration.DatasourceConfiguration
+  com.alibaba.nacos.persistence.configuration.DatasourceConfiguration,\
+  com.alibaba.nacos.persistence.flyway.FlywayInitializer

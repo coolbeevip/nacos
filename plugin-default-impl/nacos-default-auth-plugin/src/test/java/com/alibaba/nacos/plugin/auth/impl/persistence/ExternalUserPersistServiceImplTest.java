@@ -20,6 +20,7 @@ import com.alibaba.nacos.persistence.configuration.DatasourceConfiguration;
 import com.alibaba.nacos.persistence.datasource.DataSourceService;
 import com.alibaba.nacos.persistence.datasource.DynamicDataSource;
 import com.alibaba.nacos.persistence.model.Page;
+import com.alibaba.nacos.plugin.auth.impl.utils.ParamsEncryptUtil;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -82,10 +83,10 @@ class ExternalUserPersistServiceImplTest {
     
     @Test
     void testCreateUser() {
-        externalUserPersistService.createUser("username", "password");
+        externalUserPersistService.createUser("username", ParamsEncryptUtil.getInstance().encrypAES("password"));
         
         String sql = "INSERT INTO users (username, password, enabled) VALUES (?, ?, ?)";
-        Mockito.verify(jdbcTemplate).update(sql, "username", "password", true);
+        Mockito.verify(jdbcTemplate).update(sql, "username", ParamsEncryptUtil.getInstance().encrypAES("password"), true);
     }
     
     @Test

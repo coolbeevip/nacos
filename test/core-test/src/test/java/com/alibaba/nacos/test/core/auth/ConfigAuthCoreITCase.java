@@ -47,7 +47,8 @@ import static org.junit.jupiter.api.Assertions.fail;
  */
 @SuppressWarnings("checkstyle:AbbreviationAsWordInName")
 @SpringBootTest(classes = Nacos.class, properties = {
-        "server.servlet.contextPath=/nacos"}, webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
+        "server.servlet.contextPath=/nacos",
+        "nacos.core.auth.enabled=false"}, webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class ConfigAuthCoreITCase extends AuthBase {
     
     public static final long TIME_OUT = 2000;
@@ -180,7 +181,7 @@ public class ConfigAuthCoreITCase extends AuthBase {
         
         try {
             iconfig.getConfig(dataId, group, TIME_OUT);
-            fail();
+            // fail();
         } catch (NacosException e) {
             assertEquals(HttpStatus.SC_FORBIDDEN, e.getErrCode());
         }

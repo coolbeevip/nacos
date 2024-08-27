@@ -19,6 +19,9 @@ package com.alibaba.nacos.persistence.datasource;
 import com.alibaba.nacos.common.utils.CollectionUtils;
 import com.alibaba.nacos.common.utils.Preconditions;
 import com.alibaba.nacos.common.utils.StringUtils;
+import com.alibaba.nacos.persistence.configuration.DatasourceConfiguration;
+import com.alibaba.nacos.persistence.utils.ExternalDBType;
+import com.alibaba.nacos.persistence.utils.PropertiesEncrypt;
 import com.zaxxer.hikari.HikariDataSource;
 import org.springframework.boot.context.properties.bind.Bindable;
 import org.springframework.boot.context.properties.bind.Binder;
@@ -27,6 +30,7 @@ import org.springframework.core.env.Environment;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import static com.alibaba.nacos.common.utils.CollectionUtils.getOrDefault;
 
@@ -40,15 +44,23 @@ public class ExternalDataSourceProperties {
     private static final String JDBC_DRIVER_NAME = "com.mysql.cj.jdbc.Driver";
     
     private static final String TEST_QUERY = "SELECT 1";
+
+    private static final String TEST_QUERY_ORACLE = "SELECT 1 FROM DUAL";
     
     private Integer num;
-    
+
+    private List<String> driverClassName = new ArrayList<>();
+
     private List<String> url = new ArrayList<>();
     
     private List<String> user = new ArrayList<>();
     
     private List<String> password = new ArrayList<>();
-    
+
+    public void setDriverClassName(List<String> driverClassName) {
+        this.driverClassName = driverClassName;
+    }
+
     public void setNum(Integer num) {
         this.num = num;
     }
@@ -62,7 +74,8 @@ public class ExternalDataSourceProperties {
     }
     
     public void setPassword(List<String> password) {
-        this.password = password;
+        PropertiesEncrypt encryptor = PropertiesEncrypt.builder().build();
+        this.password = password.stream().map(s -> encryptor.decrypt(s)).collect(Collectors.toList());
     }
     
     /**
@@ -78,19 +91,23 @@ public class ExternalDataSourceProperties {
         Preconditions.checkArgument(Objects.nonNull(num), "db.num is null");
         Preconditions.checkArgument(CollectionUtils.isNotEmpty(user), "db.user or db.user.[index] is null");
         Preconditions.checkArgument(CollectionUtils.isNotEmpty(password), "db.password or db.password.[index] is null");
+        // Preconditions.checkArgument(CollectionUtils.isNotEmpty(driverClassName), "db.driverClassName or db.driverClassName.[index] is null");
         for (int index = 0; index < num; index++) {
             int currentSize = index + 1;
             Preconditions.checkArgument(url.size() >= currentSize, "db.url.%s is null", index);
             DataSourcePoolProperties poolProperties = DataSourcePoolProperties.build(environment);
-            if (StringUtils.isEmpty(poolProperties.getDataSource().getDriverClassName())) {
-                poolProperties.setDriverClassName(JDBC_DRIVER_NAME);
-            }
+            DatasourceConfiguration.setUseExternalDBDriverClassName(getOrDefault(driverClassName, index, JDBC_DRIVER_NAME));
+            poolProperties.setDriverClassName(getOrDefault(driverClassName, index, JDBC_DRIVER_NAME).trim());
             poolProperties.setJdbcUrl(url.get(index).trim());
             poolProperties.setUsername(getOrDefault(user, index, user.get(0)).trim());
             poolProperties.setPassword(getOrDefault(password, index, password.get(0)).trim());
             HikariDataSource ds = poolProperties.getDataSource();
             if (StringUtils.isEmpty(ds.getConnectionTestQuery())) {
-                ds.setConnectionTestQuery(TEST_QUERY);
+                if (ExternalDBType.dbType() == ExternalDBType.DBType.ORACLE) {
+                    ds.setConnectionTestQuery(TEST_QUERY_ORACLE);
+                } else if (StringUtils.isEmpty(ds.getConnectionTestQuery())) {
+                    ds.setConnectionTestQuery(TEST_QUERY);
+                }
             }
             
             dataSources.add(ds);
