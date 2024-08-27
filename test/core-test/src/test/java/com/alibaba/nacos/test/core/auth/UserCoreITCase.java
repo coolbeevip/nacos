@@ -20,11 +20,14 @@ import com.alibaba.nacos.Nacos;
 import com.alibaba.nacos.common.utils.JacksonUtils;
 import com.alibaba.nacos.persistence.model.Page;
 import com.alibaba.nacos.plugin.auth.impl.persistence.User;
+import com.alibaba.nacos.plugin.auth.impl.utils.ParamsEncryptUtil;
 import com.alibaba.nacos.plugin.auth.impl.utils.PasswordEncoderUtil;
 import com.alibaba.nacos.test.base.HttpClient4Test;
 import com.alibaba.nacos.test.base.Params;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
+import org.apache.commons.io.FileUtils;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -60,7 +63,20 @@ class UserCoreITCase extends HttpClient4Test {
     private int port;
     
     private String accessToken;
-    
+
+    private String nacosPassword = "nacos";
+
+    public String getNacosPassword() {
+        return nacosPassword;
+    }
+
+    @AfterAll
+    public static void afterClass() throws Exception {
+        String userHome = System.getProperty("user.home");
+        String nacosDataDir = userHome + "/nacos/data";
+        FileUtils.deleteDirectory(FileUtils.getFile(nacosDataDir));
+    }
+
     @BeforeEach
     void init() throws Exception {
         TimeUnit.SECONDS.sleep(5L);
@@ -90,7 +106,7 @@ class UserCoreITCase extends HttpClient4Test {
     
     @Test
     void login() {
-        ResponseEntity<String> response = login("nacos", "nacos");
+        ResponseEntity<String> response = login("nacos", ParamsEncryptUtil.getInstance().encrypAES(this.getNacosPassword()));
         assertTrue(response.getStatusCode().is2xxSuccessful());
         JsonNode json = JacksonUtils.toObj(response.getBody());
         assertTrue(json.has("accessToken"));
@@ -98,7 +114,7 @@ class UserCoreITCase extends HttpClient4Test {
     }
     
     private ResponseEntity<String> login(String username, String password) {
-        return request("/nacos/v1/auth/users/login",
+        return requestWithoutEscape("/nacos/v1/auth/users/login",
                 Params.newParams().appendParam("username", username).appendParam("password", password).done(),
                 String.class, HttpMethod.POST);
     }
@@ -140,8 +156,8 @@ class UserCoreITCase extends HttpClient4Test {
         assertTrue(found);
         
         // Update a user:
-        response = request("/nacos/v1/auth/users",
-                Params.newParams().appendParam("username", "username1").appendParam("newPassword", "password2")
+        response = requestWithoutEscape("/nacos/v1/auth/users",
+                Params.newParams().appendParam("username", "username1").appendParam("newPassword", ParamsEncryptUtil.getInstance().encrypAES("password2"))
                         .appendParam("accessToken", accessToken).done(), String.class, HttpMethod.PUT);
         
         assertTrue(response.getStatusCode().is2xxSuccessful());
@@ -218,29 +234,29 @@ class UserCoreITCase extends HttpClient4Test {
         assertTrue(response.getStatusCode().is2xxSuccessful());
         
         // user login
-        response = login("username1", "password1");
+        response = login("username1", ParamsEncryptUtil.getInstance().encrypAES("password1"));
         assertTrue(response.getStatusCode().is2xxSuccessful());
         
-        response = login("username2", "password2");
+        response = login("username2", ParamsEncryptUtil.getInstance().encrypAES("password2"));
         assertTrue(response.getStatusCode().is2xxSuccessful());
         
         // update by admin
-        response = request("/nacos/v1/auth/users",
-                Params.newParams().appendParam("username", "username1").appendParam("newPassword", "password3")
+        response = requestWithoutEscape("/nacos/v1/auth/users",
+                Params.newParams().appendParam("username", "username1").appendParam("newPassword", ParamsEncryptUtil.getInstance().encrypAES("password3"))
                         .appendParam("accessToken", accessToken).done(), String.class, HttpMethod.PUT);
         assertTrue(response.getStatusCode().is2xxSuccessful());
         
         // update by same user
         String user1AccessToken = JacksonUtils.toObj(response.getBody()).get("accessToken").textValue();
-        response = request("/nacos/v1/auth/users",
-                Params.newParams().appendParam("username", "username1").appendParam("newPassword", "password4")
+        response = requestWithoutEscape("/nacos/v1/auth/users",
+                Params.newParams().appendParam("username", "username1").appendParam("newPassword", ParamsEncryptUtil.getInstance().encrypAES("password4"))
                         .appendParam("accessToken", user1AccessToken).done(), String.class, HttpMethod.PUT);
         assertTrue(response.getStatusCode().is2xxSuccessful());
         
         // update by another user
         String user2AccessToken = JacksonUtils.toObj(response.getBody()).get("accessToken").textValue();
-        response = request("/nacos/v1/auth/users",
-                Params.newParams().appendParam("username", "username1").appendParam("newPassword", "password5")
+        response = requestWithoutEscape("/nacos/v1/auth/users",
+                Params.newParams().appendParam("username", "username1").appendParam("newPassword", ParamsEncryptUtil.getInstance().encrypAES("password5"))
                         .appendParam("accessToken", user2AccessToken).done(), String.class, HttpMethod.PUT);
         assertEquals(HttpStatus.FORBIDDEN, response.getStatusCode());
     }

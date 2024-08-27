@@ -100,12 +100,7 @@ const request = () => {
         }
         Message.error(message);
 
-        if (
-          [401, 403].includes(status) &&
-          ['unknown user!', 'token invalid!', 'token expired!', 'session expired!'].includes(
-            message
-          )
-        ) {
+        if ([401, 403].includes(status)) {
           goLogin();
         }
         return Promise.reject(error.response);

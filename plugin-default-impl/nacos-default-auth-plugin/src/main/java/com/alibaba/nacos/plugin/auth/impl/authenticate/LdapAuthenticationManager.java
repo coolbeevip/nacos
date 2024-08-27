@@ -57,7 +57,7 @@ public class LdapAuthenticationManager extends AbstractAuthenticationManager {
     @Override
     public NacosUser authenticate(String username, String rawPassword) throws AccessException {
         if (StringUtils.isBlank(username)) {
-            throw new AccessException("user not found!");
+            throw new AccessException("未授权访问!");
         }
         
         if (!caseSensitive) {

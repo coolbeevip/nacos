@@ -20,6 +20,7 @@ import com.alibaba.nacos.sys.filter.NacosTypeExcludeFilter;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.AutoConfigurationExcludeFilter;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.flyway.FlywayAutoConfiguration;
 import org.springframework.boot.context.TypeExcludeFilter;
 import org.springframework.boot.web.servlet.ServletComponentScan;
 import org.springframework.context.annotation.ComponentScan;
@@ -34,7 +35,7 @@ import org.springframework.context.annotation.FilterType;
  *
  * @author nacos
  */
-@SpringBootApplication
+@SpringBootApplication(exclude = FlywayAutoConfiguration.class)
 @ComponentScan(basePackages = "com.alibaba.nacos", excludeFilters = {
         @Filter(type = FilterType.CUSTOM, classes = {NacosTypeExcludeFilter.class}),
         @Filter(type = FilterType.CUSTOM, classes = {TypeExcludeFilter.class}),

@@ -22,6 +22,7 @@ import com.alibaba.nacos.persistence.configuration.condition.ConditionOnExternal
 import com.alibaba.nacos.persistence.datasource.DataSourceService;
 import com.alibaba.nacos.persistence.datasource.DynamicDataSource;
 import com.alibaba.nacos.persistence.model.Page;
+import com.alibaba.nacos.persistence.utils.ExternalDBType;
 import com.alibaba.nacos.plugin.auth.impl.persistence.extrnal.AuthExternalPaginationHelperImpl;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -68,7 +69,7 @@ public class ExternalUserPersistServiceImpl implements UserPersistService {
         String sql = "INSERT INTO users (username, password, enabled) VALUES (?, ?, ?)";
         
         try {
-            jt.update(sql, username, password, true);
+            jt.update(sql, username, password, ExternalDBType.dbType() == ExternalDBType.DBType.DERBY ? true : 1);
         } catch (CannotGetJdbcConnectionException e) {
             LogUtil.FATAL_LOG.error("[db-error] " + e.toString(), e);
             throw e;

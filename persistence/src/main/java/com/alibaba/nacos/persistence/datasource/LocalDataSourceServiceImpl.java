@@ -57,7 +57,7 @@ public class LocalDataSourceServiceImpl implements DataSourceService {
     
     private final String userName = "nacos";
     
-    private final String password = "nacos";
+    private final String password = "123456";
     
     private final String derbyBaseDir = "data" + File.separator + PersistenceConstant.DERBY_BASE_DIR;
     
