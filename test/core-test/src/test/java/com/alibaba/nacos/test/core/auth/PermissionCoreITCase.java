@@ -20,6 +20,7 @@ import com.alibaba.nacos.Nacos;
 import com.alibaba.nacos.common.utils.JacksonUtils;
 import com.alibaba.nacos.persistence.model.Page;
 import com.alibaba.nacos.plugin.auth.api.Permission;
+import com.alibaba.nacos.plugin.auth.impl.utils.ParamsEncryptUtil;
 import com.alibaba.nacos.test.base.HttpClient4Test;
 import com.alibaba.nacos.test.base.Params;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -58,7 +59,13 @@ class PermissionCoreITCase extends HttpClient4Test {
     private int port;
     
     private String accessToken;
-    
+
+    private String nacosPassword = "nacos";
+
+    public String getNacosPassword() {
+        return nacosPassword;
+    }
+
     @BeforeEach
     void init() throws Exception {
         TimeUnit.SECONDS.sleep(5L);
@@ -102,9 +109,9 @@ class PermissionCoreITCase extends HttpClient4Test {
     
     @Test
     void login() {
-        
-        ResponseEntity<String> response = request("/nacos/v1/auth/users/login",
-                Params.newParams().appendParam("username", "nacos").appendParam("password", "nacos").done(),
+
+        ResponseEntity<String> response = requestWithoutEscape("/nacos/v1/auth/users/login",
+                Params.newParams().appendParam("username", "nacos").appendParam("password", ParamsEncryptUtil.getInstance().encrypAES(this.getNacosPassword())).done(),
                 String.class, HttpMethod.POST);
         
         assertTrue(response.getStatusCode().is2xxSuccessful());

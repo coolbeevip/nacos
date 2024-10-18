@@ -31,6 +31,7 @@ import com.alibaba.nacos.plugin.auth.impl.roles.NacosRoleServiceImpl;
 import com.alibaba.nacos.plugin.auth.impl.token.TokenManagerDelegate;
 import com.alibaba.nacos.plugin.auth.impl.users.NacosUser;
 import com.alibaba.nacos.plugin.auth.impl.users.NacosUserDetailsServiceImpl;
+import com.alibaba.nacos.plugin.auth.impl.utils.ParamsEncryptUtil;
 import com.alibaba.nacos.sys.env.EnvUtil;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -121,7 +122,7 @@ class UserControllerTest {
         when(authenticationManager.hasGlobalAdminRole(user)).thenReturn(true);
         when(authConfigs.getNacosAuthSystemType()).thenReturn(AuthSystemTypes.NACOS.name());
         when(tokenManagerDelegate.getTokenTtlInSeconds(anyString())).thenReturn(18000L);
-        Object actual = userController.login("nacos", "nacos", response, request);
+        Object actual = userController.login("nacos", ParamsEncryptUtil.getInstance().encrypAES("test"), response, request);
         assertTrue(actual instanceof JsonNode);
         String actualString = actual.toString();
         assertTrue(actualString.contains("\"accessToken\":\"1234567890\""));
@@ -214,7 +215,7 @@ class UserControllerTest {
         when(userDetailsService.getUserFromDatabase(anyString())).thenReturn(new User());
         MockHttpServletRequest mockHttpServletRequest = new MockHttpServletRequest();
         MockHttpServletResponse mockHttpServletResponse = new MockHttpServletResponse();
-        RestResult<String> result = (RestResult<String>) userController.updateUser("nacos", "test",
+        RestResult<String> result = (RestResult<String>) userController.updateUser("nacos", ParamsEncryptUtil.getInstance().encrypAES("test"),
                 mockHttpServletResponse, mockHttpServletRequest);
         assertEquals(200, result.getCode());
         
@@ -229,7 +230,7 @@ class UserControllerTest {
         MockHttpServletResponse mockHttpServletResponse = new MockHttpServletResponse();
         
         assertThrows(IllegalArgumentException.class, () -> {
-            userController.updateUser("nacos", "test", mockHttpServletResponse, mockHttpServletRequest);
+            userController.updateUser("nacos", ParamsEncryptUtil.getInstance().encrypAES("test"), mockHttpServletResponse, mockHttpServletRequest);
         });
     }
     
@@ -239,7 +240,7 @@ class UserControllerTest {
         when(authConfigs.isAuthEnabled()).thenReturn(true);
         MockHttpServletRequest mockHttpServletRequest = new MockHttpServletRequest();
         MockHttpServletResponse mockHttpServletResponse = new MockHttpServletResponse();
-        Object result = userController.updateUser("nacos", "test", mockHttpServletResponse, mockHttpServletRequest);
+        Object result = userController.updateUser("nacos", ParamsEncryptUtil.getInstance().encrypAES("test"), mockHttpServletResponse, mockHttpServletRequest);
         
         assertNull(result);
         assertEquals(HttpServletResponse.SC_UNAUTHORIZED, mockHttpServletResponse.getStatus());
@@ -254,7 +255,7 @@ class UserControllerTest {
         when(userDetailsService.getUserFromDatabase(anyString())).thenReturn(new User());
         MockHttpServletRequest mockHttpServletRequest = new MockHttpServletRequest();
         MockHttpServletResponse mockHttpServletResponse = new MockHttpServletResponse();
-        RestResult<String> result = (RestResult<String>) userController.updateUser("nacos", "test",
+        RestResult<String> result = (RestResult<String>) userController.updateUser("nacos", ParamsEncryptUtil.getInstance().encrypAES("test"),
                 mockHttpServletResponse, mockHttpServletRequest);
         assertEquals(200, result.getCode());
         
@@ -270,7 +271,7 @@ class UserControllerTest {
         
         MockHttpServletRequest mockHttpServletRequest = new MockHttpServletRequest();
         MockHttpServletResponse mockHttpServletResponse = new MockHttpServletResponse();
-        RestResult<String> result = (RestResult<String>) userController.updateUser("nacos", "test",
+        RestResult<String> result = (RestResult<String>) userController.updateUser("nacos", ParamsEncryptUtil.getInstance().encrypAES("test"),
                 mockHttpServletResponse, mockHttpServletRequest);
         assertEquals(200, result.getCode());
         
@@ -285,7 +286,7 @@ class UserControllerTest {
         
         MockHttpServletRequest mockHttpServletRequest = new MockHttpServletRequest();
         MockHttpServletResponse mockHttpServletResponse = new MockHttpServletResponse();
-        Object result = userController.updateUser("nacos", "test", mockHttpServletResponse, mockHttpServletRequest);
+        Object result = userController.updateUser("nacos", ParamsEncryptUtil.getInstance().encrypAES("test"), mockHttpServletResponse, mockHttpServletRequest);
         
         assertNull(result);
         assertEquals(HttpServletResponse.SC_UNAUTHORIZED, mockHttpServletResponse.getStatus());
@@ -302,7 +303,7 @@ class UserControllerTest {
         
         MockHttpServletRequest mockHttpServletRequest = new MockHttpServletRequest();
         MockHttpServletResponse mockHttpServletResponse = new MockHttpServletResponse();
-        Object result = userController.updateUser("nacos", "test", mockHttpServletResponse, mockHttpServletRequest);
+        Object result = userController.updateUser("nacos", ParamsEncryptUtil.getInstance().encrypAES("test"), mockHttpServletResponse, mockHttpServletRequest);
         
         assertNull(result);
         assertEquals(HttpServletResponse.SC_FORBIDDEN, mockHttpServletResponse.getStatus());

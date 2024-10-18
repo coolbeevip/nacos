@@ -26,4 +26,8 @@ public class DataSourceConstant {
     public static final String MYSQL = "mysql";
     
     public static final String DERBY = "derby";
+
+    public static final String POSTGRESQL = "postgresql";
+
+    public static final String ORACLE = "oracle";
 }

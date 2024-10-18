@@ -29,7 +29,7 @@ class DataSourcePoolPropertiesTest {
     
     private static final String JDBC_DRIVER_CLASS_NAME = "org.apache.derby.jdbc.EmbeddedDriver";
     
-    private static final String PASSWORD = "nacos";
+    private static final String PASSWORD = "123456";
     
     private static final String USERNAME = "nacos_devtest";
     

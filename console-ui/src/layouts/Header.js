@@ -90,24 +90,14 @@ class Header extends React.Component {
     const { passwordResetUser = '', passwordResetUserVisible = false } = this.state;
     const BASE_URL =
       language.toLocaleLowerCase() === 'en-us' ? 'https://nacos.io/en/' : 'https://nacos.io/';
-    const NAV_MENU = [
-      { id: 1, title: home, link: BASE_URL },
-      { id: 2, title: docs, link: `${BASE_URL}docs/latest/what-is-nacos/` },
-      { id: 3, title: blog, link: `${BASE_URL}blog/` },
-      { id: 4, title: community, link: `${BASE_URL}news/` },
-      {
-        id: 5,
-        title: enterprise,
-        link: 'https://cn.aliyun.com/product/aliware/mse?spm=nacos-website.topbar.0.0.0',
-      },
-    ];
+    const NAV_MENU = [];
     return (
       <>
         <header className="header-container header-container-primary">
           <div className="header-body">
             <a href="#" onClick={this.indexAction} rel="noopener noreferrer">
               <img
-                src="img/logo-2000-390.svg"
+                src="img/logo-nc.png"
                 className="logo"
                 alt={siteConfig.name}
                 title={siteConfig.name}
@@ -122,9 +112,6 @@ class Header extends React.Component {
                 </Menu>
               </Dropdown>
             )}
-            <span className="language-switch language-switch-primary" onClick={this.switchLang}>
-              {languageSwitchButton}
-            </span>
             <div className="header-menu header-menu-open">
               <ul>
                 {NAV_MENU.map(item => (

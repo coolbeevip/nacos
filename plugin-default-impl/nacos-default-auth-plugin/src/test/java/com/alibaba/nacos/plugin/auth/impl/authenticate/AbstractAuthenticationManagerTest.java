@@ -26,6 +26,7 @@ import com.alibaba.nacos.plugin.auth.impl.token.TokenManagerDelegate;
 import com.alibaba.nacos.plugin.auth.impl.users.NacosUser;
 import com.alibaba.nacos.plugin.auth.impl.users.NacosUserDetails;
 import com.alibaba.nacos.plugin.auth.impl.users.NacosUserDetailsServiceImpl;
+import com.alibaba.nacos.plugin.auth.impl.utils.ParamsEncryptUtil;
 import com.alibaba.nacos.plugin.auth.impl.utils.PasswordEncoderUtil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -153,7 +154,7 @@ public class AbstractAuthenticationManagerTest {
         MockHttpServletRequest mockHttpServletRequest = new MockHttpServletRequest();
         mockHttpServletRequest.addHeader(AuthConstants.AUTHORIZATION_HEADER, "token");
         mockHttpServletRequest.addParameter(AuthConstants.PARAM_USERNAME, "nacos");
-        mockHttpServletRequest.addParameter(AuthConstants.PARAM_PASSWORD, "test");
+        mockHttpServletRequest.addParameter(AuthConstants.PARAM_PASSWORD, ParamsEncryptUtil.getInstance().encrypAES("test"));
         NacosUser authenticate = abstractAuthenticationManager.authenticate(mockHttpServletRequest);
         
         assertEquals("token", authenticate.getToken());

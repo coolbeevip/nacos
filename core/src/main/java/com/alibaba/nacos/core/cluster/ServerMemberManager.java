@@ -343,7 +343,7 @@ public class ServerMemberManager implements ApplicationListener<WebServerInitial
     public Collection<Member> allMembers() {
         // We need to do a copy to avoid affecting the real data
         HashSet<Member> set = new HashSet<>(serverList.values());
-        set.add(self);
+        // set.add(self); 避免集群自动添加本机 IP 到 cluster.conf
         return set;
     }
     
@@ -367,7 +367,8 @@ public class ServerMemberManager implements ApplicationListener<WebServerInitial
         boolean isContainSelfIp = members.stream()
                 .anyMatch(ipPortTmp -> Objects.equals(localAddress, ipPortTmp.getAddress()));
         
-        if (isContainSelfIp) {
+        // if (isContainSelfIp) {
+        if (true) {
             isInIpList = true;
         } else {
             isInIpList = false;

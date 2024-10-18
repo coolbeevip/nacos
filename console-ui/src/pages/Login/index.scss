@@ -37,11 +37,10 @@ $contentWidth: 1280px;
     position: relative;
     height: 100vh;
     .login-panel {
-      position: absolute;
-      right: 40px;
+      position: relative;
+      margin: 0px auto;
       width: 480px;
       height: 540px;
-      top: 90px;
       border: 0px;
       input,
       input::-webkit-input-placeholder {
@@ -57,11 +56,10 @@ $contentWidth: 1280px;
       .internal-sys-tip {
         width: 100%;
         line-height: 25px;
-        font-size: 20px;
+        font-size: 11px;
         margin-top: 25px;
         text-align: center;
-        font-weight: 800;
-        color: #ff0000cc;
+        color: rgb(191 184 184 / 80%);
       }
       .login-form {
         width: 360px;

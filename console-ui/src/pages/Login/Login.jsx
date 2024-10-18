@@ -103,25 +103,13 @@ class Login extends React.Component {
         <section
           className="top-section"
           style={{
-            background: 'url(img/black_dot.png) repeat',
             backgroundSize: '14px 14px',
+            paddingTop: '50px',
+            backgroundColor: '#252a2f'
           }}
         >
-          <div className="vertical-middle product-area">
-            <img className="product-logo" src="img/nacos.png" />
-            <p className="product-desc">{locale.productDesc}</p>
-          </div>
-          <div className="animation animation1" />
-          <div className="animation animation2" />
-          <div className="animation animation3" />
-          <div className="animation animation4" />
-          <div className="animation animation5" />
           <Card className="login-panel" contentHeight="auto">
             <div className="login-header">{locale.login}</div>
-            <div className="internal-sys-tip">
-              <div>{locale.internalSysTip1}</div>
-              <div>{locale.internalSysTip2}</div>
-            </div>
             {!consoleUiEnable && (
               <Form className="login-form" field={this.field}>
                 <FormItem>
@@ -156,12 +144,10 @@ class Login extends React.Component {
                 <FormItem label=" ">
                   <Form.Submit onClick={this.handleSubmit}>{locale.submit}</Form.Submit>
                 </FormItem>
+                <div className="internal-sys-tip">
+                  <div>Powered By NACOS 2.4.3.2410</div>
+                </div>
               </Form>
-            )}
-            {consoleUiEnable && (
-              <Message type="notice" style={{ marginTop: 30 }}>
-                <div dangerouslySetInnerHTML={{ __html: guideMsg }} />
-              </Message>
             )}
           </Card>
         </section>
