@@ -16,10 +16,10 @@
 
 package com.alibaba.nacos.common.utils;
 
+import jdk.internal.misc.Unsafe;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -188,16 +188,20 @@ public class InternetAddressUtilTest {
     
     @Test
     void testLocalHostIP() throws NoSuchFieldException, IllegalAccessException {
+        Field unsafeField = Unsafe.class.getDeclaredField("theUnsafe");
+        unsafeField.setAccessible(true);
+        Unsafe unsafe = (Unsafe) unsafeField.get(null);
+
         Field field = InternetAddressUtil.class.getField("PREFER_IPV6_ADDRESSES");
         field.setAccessible(true);
-        Field modifiersField = Field.class.getDeclaredField("modifiers");
-        modifiersField.setAccessible(true);
-        modifiersField.setInt(field, field.getModifiers() & ~Modifier.FINAL);
-        
-        field.set(null, false);
+
+        long fieldOffset = unsafe.staticFieldOffset(field);
+        Object staticFieldBase = unsafe.staticFieldBase(field);
+
+        unsafe.putBoolean(staticFieldBase, fieldOffset, false);
         assertEquals("127.0.0.1", InternetAddressUtil.localHostIP());
-        
-        field.set(null, true);
+
+        unsafe.putBoolean(staticFieldBase, fieldOffset, true);
         assertEquals("[::1]", InternetAddressUtil.localHostIP());
     }
     

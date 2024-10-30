@@ -19,6 +19,7 @@ package com.alibaba.nacos.common.remote.client;
 import com.alibaba.nacos.api.exception.NacosException;
 import com.alibaba.nacos.common.remote.ConnectionType;
 import com.alibaba.nacos.common.utils.CollectionUtils;
+import jdk.internal.misc.Unsafe;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -28,7 +29,6 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -46,6 +46,8 @@ import static org.mockito.Mockito.verify;
 class RpcClientFactoryTest {
     
     static Field clientMapField;
+
+    static Unsafe unsafe;
     
     @Mock
     RpcClient rpcClient;
@@ -58,29 +60,35 @@ class RpcClientFactoryTest {
     
     @BeforeAll
     static void setUpBeforeClass() throws NoSuchFieldException, IllegalAccessException {
+        Field unsafeField = Unsafe.class.getDeclaredField("theUnsafe");
+        unsafeField.setAccessible(true);
+        unsafe = (Unsafe) unsafeField.get(null);
+
         clientMapField = RpcClientFactory.class.getDeclaredField("CLIENT_MAP");
         clientMapField.setAccessible(true);
-        Field modifiersField1 = Field.class.getDeclaredField("modifiers");
-        modifiersField1.setAccessible(true);
-        modifiersField1.setInt(clientMapField, clientMapField.getModifiers() & ~Modifier.FINAL);
     }
     
     @AfterEach
     void tearDown() throws IllegalAccessException {
-        clientMapField.set(null, new ConcurrentHashMap<>());
+        long fieldOffset = unsafe.staticFieldOffset(clientMapField);
+        Object staticFieldBase = unsafe.staticFieldBase(clientMapField);
+        unsafe.putObject(staticFieldBase, fieldOffset, new ConcurrentHashMap<>());
     }
     
     @Test
     void testGetAllClientEntries() throws IllegalAccessException {
         assertTrue(RpcClientFactory.getAllClientEntries().isEmpty());
-        
-        clientMapField.set(null, Collections.singletonMap("testClient", rpcClient));
+        long fieldOffset = unsafe.staticFieldOffset(clientMapField);
+        Object staticFieldBase = unsafe.staticFieldBase(clientMapField);
+        unsafe.putObject(staticFieldBase, fieldOffset, Collections.singletonMap("testClient", rpcClient));
         assertEquals(1, RpcClientFactory.getAllClientEntries().size());
     }
     
     @Test
     void testDestroyClientWhenClientExistThenRemoveAndShutDownRpcClient() throws IllegalAccessException, NacosException {
-        clientMapField.set(null, new ConcurrentHashMap<>(Collections.singletonMap("testClient", rpcClient)));
+        long fieldOffset = unsafe.staticFieldOffset(clientMapField);
+        Object staticFieldBase = unsafe.staticFieldBase(clientMapField);
+        unsafe.putObject(staticFieldBase, fieldOffset, new ConcurrentHashMap<>(Collections.singletonMap("testClient", rpcClient)));
         
         RpcClientFactory.destroyClient("testClient");
         
@@ -90,8 +98,10 @@ class RpcClientFactoryTest {
     
     @Test
     void testDestroyClientWhenClientNotExistThenDoNothing() throws IllegalAccessException, NacosException {
-        clientMapField.set(null, new ConcurrentHashMap<>(Collections.singletonMap("testClient", rpcClient)));
-        
+        long fieldOffset = unsafe.staticFieldOffset(clientMapField);
+        Object staticFieldBase = unsafe.staticFieldBase(clientMapField);
+        unsafe.putObject(staticFieldBase, fieldOffset, new ConcurrentHashMap<>(Collections.singletonMap("testClient", rpcClient)));
+
         RpcClientFactory.destroyClient("notExistClientName");
         
         Map.Entry<String, RpcClient> element = CollectionUtils.getOnlyElement(RpcClientFactory.getAllClientEntries());
@@ -104,8 +114,11 @@ class RpcClientFactoryTest {
     void testGetClient() throws IllegalAccessException {
         // may be null
         assertNull(RpcClientFactory.getClient("notExistClientName"));
-        
-        clientMapField.set(null, new ConcurrentHashMap<>(Collections.singletonMap("testClient", rpcClient)));
+
+        long fieldOffset = unsafe.staticFieldOffset(clientMapField);
+        Object staticFieldBase = unsafe.staticFieldBase(clientMapField);
+        unsafe.putObject(staticFieldBase, fieldOffset, new ConcurrentHashMap<>(Collections.singletonMap("testClient", rpcClient)));
+
         assertEquals(rpcClient, RpcClientFactory.getClient("testClient"));
     }
     

@@ -43,7 +43,6 @@ import org.mockito.stubbing.Answer;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -159,9 +158,6 @@ class RpcClientTest {
         
         reconnectionSignalField = RpcClient.class.getDeclaredField("reconnectionSignal");
         reconnectionSignalField.setAccessible(true);
-        Field modifiersField1 = Field.class.getDeclaredField("modifiers");
-        modifiersField1.setAccessible(true);
-        modifiersField1.setInt(reconnectionSignalField, reconnectionSignalField.getModifiers() & ~Modifier.FINAL);
         
         resolveServerInfoMethod = RpcClient.class.getDeclaredMethod("resolveServerInfo", String.class);
         resolveServerInfoMethod.setAccessible(true);
