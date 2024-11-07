@@ -16,6 +16,7 @@
 
 package com.alibaba.nacos.console.config;
 
+import com.alibaba.nacos.console.filter.ConsoleUIBlockFilter;
 import com.alibaba.nacos.console.filter.FrequentFailedAttemptsBlockFilter;
 import com.alibaba.nacos.console.filter.XssFilter;
 import com.alibaba.nacos.core.code.ControllerMethodsCache;
@@ -83,6 +84,11 @@ public class ConsoleConfig {
     @Bean
     public FrequentFailedAttemptsBlockFilter frequentFailedAttemptsBlockFilter() {
         return new FrequentFailedAttemptsBlockFilter();
+    }
+
+    @Bean
+    public ConsoleUIBlockFilter consoleUIBlockFilter() {
+        return new ConsoleUIBlockFilter(consoleUiEnabled);
     }
     
     @Bean
