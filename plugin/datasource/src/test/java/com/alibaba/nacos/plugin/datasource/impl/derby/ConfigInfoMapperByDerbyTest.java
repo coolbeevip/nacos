@@ -263,7 +263,7 @@ class ConfigInfoMapperByDerbyTest {
     @Test
     void testFindConfigInfoLike4PageCountRows() {
         MapperResult mapperResult = configInfoMapperByDerby.findConfigInfoLike4PageCountRows(context);
-        assertEquals("SELECT count(*) FROM config_info WHERE tenant_id LIKE ?  AND app_name = ? ", mapperResult.getSql());
+        assertEquals("SELECT count(*) FROM config_info WHERE 1=1  AND tenant_id LIKE ?  AND app_name = ? ", mapperResult.getSql());
         assertArrayEquals(new Object[] {tenantId, appName}, mapperResult.getParamList().toArray());
     }
     
