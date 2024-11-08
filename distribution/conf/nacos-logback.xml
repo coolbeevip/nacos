@@ -803,6 +803,11 @@
         <level value="INFO"/>
     </logger>
 
+    <logger name="com.alibaba.nacos.console.filter.ConsoleUIBlockFilter">
+        <appender-ref ref="CONSOLE"/>
+        <level value="INFO"/>
+    </logger>
+
     <logger name="com.alibaba.nacos.common.notify.NotifyCenter">
         <appender-ref ref="CONSOLE"/>
         <level value="INFO"/>
