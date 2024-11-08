@@ -29,7 +29,7 @@ public class ConsoleUIBlockFilter extends OncePerRequestFilter {
 
     @Scheduled(fixedRate = 60000)
     public void checkUIStatus() {
-        File file = new File("DISABLE_UI.txt");
+        File file = new File("UI_OFF.txt");
         boolean disable_flag = file.exists();
         if (disable_flag) {
             if (this.consoleUiEnabled){
