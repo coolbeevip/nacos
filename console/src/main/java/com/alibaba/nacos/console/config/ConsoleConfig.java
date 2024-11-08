@@ -88,7 +88,7 @@ public class ConsoleConfig {
 
     @Bean
     public ConsoleUIBlockFilter consoleUIBlockFilter() {
-        return new ConsoleUIBlockFilter(consoleUiEnabled);
+        return new ConsoleUIBlockFilter();
     }
     
     @Bean
