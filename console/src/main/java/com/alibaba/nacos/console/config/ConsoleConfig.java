@@ -19,6 +19,7 @@ package com.alibaba.nacos.console.config;
 import com.alibaba.nacos.console.filter.ConsoleUIBlockFilter;
 import com.alibaba.nacos.console.filter.FrequentFailedAttemptsBlockFilter;
 import com.alibaba.nacos.console.filter.XssFilter;
+import com.alibaba.nacos.core.cluster.ServerMemberManager;
 import com.alibaba.nacos.core.code.ControllerMethodsCache;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -87,8 +88,8 @@ public class ConsoleConfig {
     }
 
     @Bean
-    public ConsoleUIBlockFilter consoleUIBlockFilter() {
-        return new ConsoleUIBlockFilter();
+    public ConsoleUIBlockFilter consoleUIBlockFilter(ServerMemberManager memberManager) {
+        return new ConsoleUIBlockFilter(memberManager);
     }
     
     @Bean
