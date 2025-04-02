@@ -78,6 +78,7 @@ public class OperatorControllerV2 {
      *
      * @return switchDomain
      */
+    @Secured(action = ActionTypes.READ)
     @GetMapping("/switches")
     public Result<SwitchDomain> switches() {
         return Result.success(switchDomain);

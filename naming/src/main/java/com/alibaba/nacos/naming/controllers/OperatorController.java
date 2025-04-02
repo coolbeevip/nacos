@@ -116,6 +116,7 @@ public class OperatorController {
      * @param request no used
      * @return switchDomain
      */
+    @Secured(action = ActionTypes.READ)
     @GetMapping("/switches")
     public SwitchDomain switches(HttpServletRequest request) {
         return switchDomain;
@@ -130,7 +131,7 @@ public class OperatorController {
      * @return 'ok' if success
      * @throws Exception exception
      */
-    @Secured(resource = "naming/switches", action = ActionTypes.WRITE)
+    @Secured(resource = "naming/switches", action = ActionTypes.READ)
     @PutMapping("/switches")
     public String updateSwitch(@RequestParam(required = false) boolean debug, @RequestParam String entry,
             @RequestParam String value) throws Exception {
