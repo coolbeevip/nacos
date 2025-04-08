@@ -97,7 +97,7 @@ class Header extends React.Component {
           <div className="header-body">
             <a href="#" onClick={this.indexAction} rel="noopener noreferrer">
               <img
-                src="img/logo-nc.png"
+                src="img/logo-2000-390.svg"
                 className="logo"
                 alt={siteConfig.name}
                 title={siteConfig.name}
