@@ -157,6 +157,10 @@ public final class WhereBuilder {
      * @return Return {@link WhereBuilder}
      */
     public MapperResult build() {
-        return new MapperResult(sql + where, parameters);
+        if (!parameters.isEmpty()) {
+            return new MapperResult(sql + where, parameters);
+        }else {
+            return new MapperResult(sql, parameters);
+        }
     }
 }

@@ -389,8 +389,10 @@ public interface ConfigInfoMapper extends Mapper {
         final String[] types = (String[]) context.getWhereParameter(FieldConstant.TYPE);
         
         WhereBuilder where = new WhereBuilder("SELECT count(*) FROM config_info");
-        
-        where.like("tenant_id", tenantId);
+
+        if( tenantId!=null ) {
+            where.like("tenant_id", tenantId);
+        }
         if (StringUtils.isNotBlank(dataId)) {
             where.and().like("data_id", dataId);
         }
