@@ -40,6 +40,7 @@ public class ConfigInfoMapperByOracle extends AbstractMapperByOracle implements 
     @Override
     public String select(List<String> columns, List<String> where) {
         StringBuilder sql = new StringBuilder();
+        String table_name = getTableName();
         String method = "SELECT ";
         sql.append(method);
         for (int i = 0; i < columns.size(); i++) {
@@ -51,7 +52,7 @@ public class ConfigInfoMapperByOracle extends AbstractMapperByOracle implements 
             }
         }
         sql.append("FROM ");
-        sql.append(getTableName());
+        sql.append(table_name);
         sql.append(" ");
 
         if (where.size() == 0) {
@@ -60,7 +61,13 @@ public class ConfigInfoMapperByOracle extends AbstractMapperByOracle implements 
 
         sql.append("WHERE ");
         for (int i = 0; i < where.size(); i++) {
-            sql.append("nvl(" + where.get(i) + ", 'public')").append(" = ").append("nvl(?, 'public')");
+            String field_name = where.get(i);
+            if (table_name.toLowerCase().equals("config_info") && field_name.toLowerCase().equals("id")) {
+                sql.append("nvl(" + where.get(i) + ", 0)").append(" = ").append("nvl(?, 0)");
+            }else{
+                sql.append("nvl(" + where.get(i) + ", 'public')").append(" = ").append("nvl(?, 'public')");
+            }
+
             if (i != where.size() - 1) {
                 sql.append(" AND ");
             }
@@ -259,9 +266,11 @@ public class ConfigInfoMapperByOracle extends AbstractMapperByOracle implements 
         List<Object> paramList = new ArrayList<>();
 
         final String sql = "SELECT id,data_id,group_id,tenant_id,app_name,content,type,encrypted_data_key FROM config_info";
-        StringBuilder where = new StringBuilder(" WHERE ");
-        where.append(" tenant_id=? ");
-        paramList.add(tenant);
+        StringBuilder where = new StringBuilder(" WHERE 1=1 ");
+        if (!StringUtils.isBlank(tenant)) {
+            where.append(" tenant_id=? ");
+            paramList.add(tenant);
+        }
         if (StringUtils.isNotBlank(dataId)) {
             where.append(" AND data_id=? ");
             paramList.add(dataId);
