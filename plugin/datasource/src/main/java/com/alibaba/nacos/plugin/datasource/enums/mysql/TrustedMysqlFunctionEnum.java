@@ -31,7 +31,7 @@ public enum TrustedMysqlFunctionEnum {
     /**
      * NOW().
      */
-    NOW("NOW()", "NOW(3)");
+    NOW("NOW()", "CURRENT_TIMESTAMP(3)"); // 此处是为了兼容金仓数据库MySQL模式，金仓数据库不支持NOW()函数指定精度
 
     private static final Map<String, TrustedMysqlFunctionEnum> LOOKUP_MAP = new HashMap<>();
 

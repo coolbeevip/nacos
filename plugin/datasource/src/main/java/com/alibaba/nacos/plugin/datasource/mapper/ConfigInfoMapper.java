@@ -393,7 +393,7 @@ public interface ConfigInfoMapper extends Mapper {
         WhereBuilder where = new WhereBuilder("SELECT count(*) FROM config_info");
         where.eq("1", "1");
         if(tenantId!=null) {
-            where.like("tenant_id", tenantId);
+            where.and().like("tenant_id", tenantId);
         }
         if (StringUtils.isNotBlank(dataId)) {
             where.and().like("data_id", dataId);
