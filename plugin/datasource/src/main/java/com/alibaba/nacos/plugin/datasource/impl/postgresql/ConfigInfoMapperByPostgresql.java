@@ -16,14 +16,15 @@
 
 package com.alibaba.nacos.plugin.datasource.impl.postgresql;
 
+import com.alibaba.nacos.common.utils.ArrayUtils;
 import com.alibaba.nacos.common.utils.CollectionUtils;
 import com.alibaba.nacos.common.utils.NamespaceUtil;
 import com.alibaba.nacos.common.utils.StringUtils;
 import com.alibaba.nacos.plugin.datasource.constants.ContextConstant;
 import com.alibaba.nacos.plugin.datasource.constants.DataSourceConstant;
 import com.alibaba.nacos.plugin.datasource.constants.FieldConstant;
-import com.alibaba.nacos.plugin.datasource.mapper.AbstractMapper;
 import com.alibaba.nacos.plugin.datasource.mapper.ConfigInfoMapper;
+import com.alibaba.nacos.plugin.datasource.mapper.ext.WhereBuilder;
 import com.alibaba.nacos.plugin.datasource.model.MapperContext;
 import com.alibaba.nacos.plugin.datasource.model.MapperResult;
 
@@ -31,7 +32,6 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 /**
  * The postgresql implementation of ConfigInfoMapper.
@@ -255,6 +255,38 @@ public class ConfigInfoMapperByPostgresql extends AbstractMapperByPostgresql imp
         return new MapperResult(sql,
                 CollectionUtils.list(context.getWhereParameter(FieldConstant.TENANT_ID), context.getStartRow(),
                         context.getPageSize()));
+    }
+
+    @Override
+    public MapperResult findConfigInfoLike4PageCountRows(MapperContext context) {
+        final String dataId = (String) context.getWhereParameter(FieldConstant.DATA_ID);
+        final String group = (String) context.getWhereParameter(FieldConstant.GROUP_ID);
+        final String content = (String) context.getWhereParameter(FieldConstant.CONTENT);
+        final String appName = (String) context.getWhereParameter(FieldConstant.APP_NAME);
+        final String tenantId = (String) context.getWhereParameter(FieldConstant.TENANT_ID);
+        final String[] types = (String[]) context.getWhereParameter(FieldConstant.TYPE);
+
+        WhereBuilder where = new WhereBuilder("SELECT count(*) FROM config_info");
+        where.eq("1", 1);
+        if(tenantId!=null) {
+            where.and().like("tenant_id", tenantId);
+        }
+        if (StringUtils.isNotBlank(dataId)) {
+            where.and().like("data_id", dataId);
+        }
+        if (StringUtils.isNotBlank(group)) {
+            where.and().like("group_id", group);
+        }
+        if (StringUtils.isNotBlank(appName)) {
+            where.and().eq("app_name", appName);
+        }
+        if (StringUtils.isNotBlank(content)) {
+            where.and().like("content", content);
+        }
+        if (!ArrayUtils.isEmpty(types)) {
+            where.and().in("type", types);
+        }
+        return where.build();
     }
 
     @Override
